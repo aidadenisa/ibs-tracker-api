@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv';
 import express from 'express';
 import db from './db/connection.js';
 import { Category } from './db/schemas.js';
-
+import eventsRouter from './routes/eventsRoutes.js';
 dotenv.config();
 
 const app = express();
@@ -20,6 +20,8 @@ app.get('/', async (request, response) => {
 
   response.save('working');
 });
+
+app.use('/events', eventsRouter);
 
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);

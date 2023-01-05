@@ -6,19 +6,22 @@ const prettifyId = (schema) => {
       returnedObject.id = returnedObject._id.toString()
       delete returnedObject._id
       delete returnedObject.__v
+      return returnedObject;
     }
   })
 }
 
 const CategorySchema = new mongoose.Schema({
   name: String,
+  code: { type : String , unique : true, required : true }, 
 });
 prettifyId(CategorySchema);
 const Category = mongoose.model('Category', CategorySchema)
 
 const EventSchema = new mongoose.Schema({
   name: String,
-  category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category'}
+  category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category'},
+  code: { type : String , unique : true, required : true }
 });
 prettifyId(EventSchema);
 const Event = mongoose.model('Event', EventSchema);
