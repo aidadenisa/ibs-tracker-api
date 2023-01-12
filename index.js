@@ -18,7 +18,7 @@ app.get('/', async (request, response) => {
 
   // const result = await category.save();
 
-  response.save('working');
+  response.send('working');
 });
 
 app.use('/events', eventsRouter);
