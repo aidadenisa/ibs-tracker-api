@@ -1,0 +1,12 @@
+import mongoose from 'mongoose';
+import { prettifyId } from '../utils/dbUtils.js';
+
+const RecordSchema = new mongoose.Schema({
+  date: Date,
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  event: { type: mongoose.Schema.Types.ObjectId, ref: 'Event' }
+});
+prettifyId(RecordSchema);
+const Record = mongoose.model('Record', RecordSchema);
+
+export default Record;

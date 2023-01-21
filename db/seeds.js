@@ -1,4 +1,5 @@
-import { Category, Event } from './schemas.js';
+import Category from '../models/category.js';
+import Event from '../models/event.js';
 import mongoose from 'mongoose';
 
 const categories = [

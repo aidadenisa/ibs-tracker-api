@@ -1,9 +1,7 @@
 import mongoose from 'mongoose';
-import * as dotenv from 'dotenv';
 import seedDB from './seeds.js';
-dotenv.config();
+import { MONGODB_URI } from '../utils/config.js';
 
-const MONGODB_URI = process.env.MONGODB_URI;
 mongoose.set('strictQuery', false);
 
 mongoose.connect(MONGODB_URI, {
