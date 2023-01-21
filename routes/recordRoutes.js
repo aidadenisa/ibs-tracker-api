@@ -1,4 +1,4 @@
-import express, { response } from 'express';
+import express from 'express';
 import { Record } from '../db/schemas.js';
 import mongoose from 'mongoose';
 const router = express.Router();
@@ -11,7 +11,7 @@ router.get('/:userId', async (req, res, next) => {
     //   res.status(500).json({ error: 'There was an error getting the events. Please try again.'})
     // })
     // * Manage errors in a middleware that runs AFTER this function
-      .catch(error => next(error));
+    .catch(error => next(error));
 
   res.json(result);
 });
@@ -48,7 +48,7 @@ router.put('/:id', async (req, res, next) => {
 })
 
 router.delete('/:id', async (req, res, next) => {
-  const result = await Record.findByIdAndDelete(req.params.id)
+  await Record.findByIdAndDelete(req.params.id)
     .catch(error => next(error))
   res.status(204).end();
 })

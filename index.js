@@ -1,7 +1,5 @@
 import * as dotenv from 'dotenv';
 import express from 'express';
-import db from './db/connection.js';
-import { Category } from './db/schemas.js';
 import errorHandler from './errors/errorHandler.js';
 import eventRouter from './routes/eventRoutes.js';
 import recordRouter from './routes/recordRoutes.js';
