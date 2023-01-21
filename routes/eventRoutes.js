@@ -1,5 +1,5 @@
 import express from 'express';
-import {Event} from '../db/schemas.js';
+import { Event } from '../db/schemas.js';
 
 const router = express.Router();
 

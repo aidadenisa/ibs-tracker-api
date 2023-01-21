@@ -4,7 +4,7 @@ const errorHandler = (error, request, response, next) => {
   console.log(error.message);
 
   if(error.name === 'CastError') {
-    return response.status(400).send({ error: 'Malformed id'});
+    return response.status(400).send({ error: 'Malformed id' });
   }
 
   next(error);

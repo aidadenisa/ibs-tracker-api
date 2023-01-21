@@ -6,7 +6,7 @@ const router = express.Router();
 router.post('/', async (req, res) => {
   const data = req.body;
   if(!data.email) {
-    res.status(400).json({error: 'You need to specify an email for the user'});
+    res.status(400).json({ error: 'You need to specify an email for the user' });
   }
 
   const newUser = new User({

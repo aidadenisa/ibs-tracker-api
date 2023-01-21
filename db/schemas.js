@@ -20,7 +20,7 @@ const Category = mongoose.model('Category', CategorySchema)
 
 const EventSchema = new mongoose.Schema({
   name: String,
-  category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category'},
+  category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category' },
   code: { type : String , unique : true, required : true }
 });
 prettifyId(EventSchema);
@@ -39,8 +39,8 @@ const User = mongoose.model('User', UserSchema);
 
 const RecordSchema = new mongoose.Schema({
   date: Date,
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User'},
-  event: { type: mongoose.Schema.Types.ObjectId, ref: 'Event'}
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  event: { type: mongoose.Schema.Types.ObjectId, ref: 'Event' }
 });
 prettifyId(RecordSchema);
 const Record = mongoose.model('Record', RecordSchema);

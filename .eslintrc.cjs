@@ -23,5 +23,15 @@ module.exports = {
 			'error',
 			'single'
 		],
+		// if we use == instead of ===
+		'eqeqeq': 'error',
+		'arrow-spacing': [
+			'error', { 'before': true, 'after': true }
+		],
+		'object-curly-spacing': [
+			'error', 'always'
+		],
+		// deactivate a recommended rule
+		'no-console': 0
 	}
 }

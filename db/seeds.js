@@ -1,4 +1,4 @@
-import {Category, Event} from './schemas.js';
+import { Category, Event } from './schemas.js';
 import mongoose from 'mongoose';
 
 const categories = [
@@ -58,7 +58,7 @@ const seedCategories = async () => {
   const existingCategories = await Category.find({});
   if(!existingCategories.length) {
     return await Category.insertMany(
-      categories.map(c => ({name: c.name, code: c.name.toUpperCase()}))
+      categories.map(c => ({ name: c.name, code: c.name.toUpperCase() }))
     );
   }
   return existingCategories;
@@ -66,7 +66,7 @@ const seedCategories = async () => {
 
 const seedEvent= async (currentCategories, categoryCode) => {
   const categoryID = currentCategories.find(e => e.code === categoryCode).toJSON().id;
-  const existingEvents = await Event.find({category: mongoose.Types.ObjectId(categoryID)});
+  const existingEvents = await Event.find({ category: mongoose.Types.ObjectId(categoryID) });
   if(!existingEvents.length) {
     return await Event.insertMany(
       events[categoryCode].map( e => ({
