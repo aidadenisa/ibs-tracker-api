@@ -2,7 +2,9 @@ import * as dotenv from 'dotenv';
 import express from 'express';
 import db from './db/connection.js';
 import { Category } from './db/schemas.js';
-import eventsRouter from './routes/eventsRoutes.js';
+import eventRouter from './routes/eventRoutes.js';
+import recordRouter from './routes/recordRoutes.js';
+import userRouter from './routes/userRoutes.js';
 dotenv.config();
 
 const app = express();
@@ -21,7 +23,9 @@ app.get('/', async (request, response) => {
   response.send('working');
 });
 
-app.use('/events', eventsRouter);
+app.use('/events', eventRouter);
+app.use('/records', recordRouter);
+app.use('/users', userRouter);
 
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);
