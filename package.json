@@ -21,8 +21,10 @@
   },
   "homepage": "https://github.com/aidadenisa/ibs-tracker-api#readme",
   "dependencies": {
+    "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "express-async-errors": "^3.1.1",
     "mongoose": "^6.8.2"
   },
   "devDependencies": {

@@ -12,3 +12,9 @@ test('reverse of abcde', () => {
 
   expect(result).toBe('edcba');
 });
+
+test('reverse of releveler', () => {
+  const result = reverse('releveler');
+
+  expect(result).toBe('releveler');
+});
