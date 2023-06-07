@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import Record from '../models/record.js';
 import logger from '../utils/logger.js';
+import userService from '../services/users.js';
 
 const createNewRecord = async (record) => {
   const newRecord = new Record({
@@ -8,8 +9,9 @@ const createNewRecord = async (record) => {
     user: mongoose.Types.ObjectId(record.userId),
     event: mongoose.Types.ObjectId(record.eventId),
   });
-
   const result = await newRecord.save();
+
+  await userService.updateUserRecordIds(result.user,result._id);
   logger.info(result);
   return result;
 }
@@ -37,6 +39,7 @@ const updateRecordProperties = async (recordId, properties) => {
 }
 
 const deleteRecord = async (recordId) => {
+  // TODO: REMOVE RECORD ID FROM THE USER COLLECTION
   return await Record.findByIdAndDelete(recordId);
 }
 
