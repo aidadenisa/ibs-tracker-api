@@ -8,7 +8,14 @@ const errorHandler = (error, request, response, next) => {
   if(error.name === 'CastError') {
     return response.status(400).send({ error: 'Malformed id' });
   }
-  logger.error('again');
+  
+  if(error.message && error.message.match(/expected `email` to be unique/)) {
+    return response.status(400).send({ error: 'The email address is already in use. Please use another one.'});
+  }
+
+  if(error.stack && error.stack.match(/ValidationError/)) {
+    return response.status(400).send({ error: 'The data you send is not valid.'});
+  }
   next(error);
 }
 
