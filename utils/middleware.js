@@ -16,6 +16,14 @@ const errorHandler = (error, request, response, next) => {
   if(error.stack && error.stack.match(/ValidationError/)) {
     return response.status(400).send({ error: 'The data you send is not valid.'});
   }
+
+  if(error.message && error.message.match(/User not found/)) {
+    return response.status(404).send({ error: 'User not found.' });
+  }
+
+  if(error.message && error.message.match(/Invalid email or password/)) {
+    return response.status(401).send({ error: 'Invalid email or password.'});
+  }
   next(error);
 }
 

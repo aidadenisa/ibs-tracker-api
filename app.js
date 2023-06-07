@@ -5,6 +5,7 @@ import { errorHandler } from './utils/middleware.js';
 import eventRouter from './controllers/events.js';
 import recordRouter from './controllers/records.js';
 import userRouter from './controllers/users.js';
+import authRouter from './controllers/auth.js';
 
 await connectDB();
 
@@ -20,6 +21,7 @@ app.get('/', async (request, response) => {
   response.send('working');
 });
 
+app.use('/auth', authRouter);
 app.use('/events', eventRouter);
 app.use('/records', recordRouter);
 app.use('/users', userRouter);
