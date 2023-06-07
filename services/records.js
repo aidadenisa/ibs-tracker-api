@@ -14,7 +14,16 @@ const createNewRecord = async (record) => {
   return result;
 }
 
-const listRecordsByUserId = (userId) => {
+const listRecordsByUserId = (userId, populate) => {
+  if(!!populate) {
+    return Record.find({ user: userId }).populate({
+      path: 'event',
+      populate: {
+          path: 'category', 
+          model: 'Category'
+      }
+    });
+  }
   return Record.find({ user: userId });
 }
 
