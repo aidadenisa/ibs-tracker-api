@@ -1,20 +1,24 @@
 import mongoose from 'mongoose';
-import seedDB from './seeds.js';
+import { seedDB } from './seeds.js';
 import { MONGODB_URI } from '../utils/config.js';
 
-mongoose.set('strictQuery', false);
-
-mongoose.connect(MONGODB_URI, {
-  useNewUrlParser: true, 
-  useUnifiedTopology: true,
-}).then( () => {
-  console.log('connected to MongoDB');
-})
-  .catch((error) => {
+const connectDB = async () => {
+  mongoose.set('strictQuery', false);
+  console.log('MONGODB_URI: ---------',MONGODB_URI)
+  await mongoose.connect(MONGODB_URI, {
+    useNewUrlParser: true, 
+    useUnifiedTopology: true,
+  }).catch((error) => {
     console.log('error connecting to MongoDB:', error.message)
-  })
-const db = mongoose.connect;
+  });
+  console.log('connected to MongoDB');
 
-seedDB();
+  //Populate DB with seeds
+  await seedDB();
 
-export default db;
+  return mongoose.connect
+}
+
+export {
+  connectDB
+};

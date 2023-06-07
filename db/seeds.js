@@ -82,9 +82,13 @@ const seedEvent= async (currentCategories, categoryCode) => {
 
 const seedDB = async () => {
   const currentCategories = await seedCategories();
-  seedEvent(currentCategories, 'SYMPTOM');
-  seedEvent(currentCategories, 'STOOL');
-  seedEvent(currentCategories, 'MENSTRUATION');
+  await seedEvent(currentCategories, 'SYMPTOM');
+  await seedEvent(currentCategories, 'STOOL');
+  await seedEvent(currentCategories, 'MENSTRUATION');
 }
 
-export default seedDB;
+export {
+  seedDB,
+  categories,
+  events
+};
