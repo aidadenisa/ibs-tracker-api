@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.get('/:id', async (req, res, next) => {
   try {
-    const result = await userService.getUserById(req.params.id);
+    const result = await userService.getUserById(req.params.id, req.query.populate);
     res.json(result);
   } catch(err) { next(err) };
 });
