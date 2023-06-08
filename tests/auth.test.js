@@ -1,17 +1,17 @@
 import mongoose from 'mongoose';
 import User from '../models/user';
-import userService from '../services/users';
+import authService from '../services/auth';
 import supertest from 'supertest';
 import app from '../app';
 
 const api = supertest(app);
 
-describe('user', () => {
+describe('auth: user', () => {
 
   // delete all users and create a dummy initial user
   beforeEach(async () => {
     await User.deleteMany({});
-    await userService.createNewUser({
+    await authService.signup({
       firstName: 'Test First',
       lastName: 'Test Last',
       pass: '123456',
@@ -29,7 +29,7 @@ describe('user', () => {
       email: 'initial@test.com',
       hasMenstruationSupport: true,
     };
-    const result = await api.post('/users')
+    const result = await api.post('/auth/signup')
       .send(newUser)
       .expect(400)
       .expect('Content-Type', /application\/json/);
@@ -51,7 +51,7 @@ describe('user', () => {
       hasMenstruationSupport: false,
     };
 
-    const result = await api.post('/users')
+    const result = await api.post('/auth/signup')
       .send(newUser)
       .expect(200)
       .expect('Content-Type', /application\/json/);
