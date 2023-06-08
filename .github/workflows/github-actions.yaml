@@ -2,8 +2,7 @@ name: pull-request
 on:
   pull_request:
     branches: [ main ]
-env:
-  MONGODB_URI: ${{secrets.MONGODB_URI}}
+
 jobs:
   buildAndTest:
     runs-on: ubuntu-latest
@@ -16,4 +15,6 @@ jobs:
       - name: Install dependencies
         run: yarn install
       - name: Run tests 
+        env:
+          MONGODB_URI: ${{secrets.MONGODB_URI}}
         run: yarn test
