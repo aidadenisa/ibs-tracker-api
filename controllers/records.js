@@ -4,11 +4,10 @@ import logger from '../utils/logger.js';
 
 const router = express.Router();
 
-// TODO: Replace this after adding auth with logged in user's credentials
-router.get('/:userId', async (req, res, next) => {
+router.get('/', async (req, res, next) => {
   try {
     const result = await recordsService
-      .listRecordsByUserId(req.params.userId, req.query.populate);
+      .listRecordsByUserId(req.user.id, req.query.populate);
     logger.info(result)
     res.json(result);
   } catch (err) { next(err) };
@@ -16,11 +15,11 @@ router.get('/:userId', async (req, res, next) => {
 
 router.post('/', async (req, res, next) => {
   const data = req.body;
-  if (!data || !data.userId || !data.eventId) {
-    return res.status(400).json({ error: 'Missing required properties: userId or eventId' })
+  if (!data || !data.eventId) {
+    return res.status(400).json({ error: 'Missing required properties: eventId' })
   }
   try {
-    const result = await recordsService.createNewRecord(data);
+    const result = await recordsService.createNewRecord(data, req.user);
     res.json(result);
   } catch (err) { next(err) };
 });
@@ -30,7 +29,7 @@ router.put('/:id', async (req, res, next) => {
     res.status(400).json({ error: 'You need to specify an event for updating the record.' })
   }
   try {
-    const result = await recordsService.updateRecordProperties(req.body);
+    const result = await recordsService.updateRecordProperties(req.params.id, req.body);
     res.json(result);
   } catch (err) { next(err) };
 })

@@ -3,7 +3,7 @@ import User from '../models/user.js';
 import logger from '../utils/logger.js';
 
 const getUserById = (userId, populate) => {
-  if(!!populate) {
+  if(populate && populate.toLowerCase() === 'true') {
     return User.findById(userId).populate('records');
   }
   return User.findById(userId);

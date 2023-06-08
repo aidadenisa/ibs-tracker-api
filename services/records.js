@@ -3,10 +3,10 @@ import Record from '../models/record.js';
 import logger from '../utils/logger.js';
 import userService from '../services/users.js';
 
-const createNewRecord = async (record) => {
+const createNewRecord = async (record, user) => {
   const newRecord = new Record({
     date: new Date(),
-    user: mongoose.Types.ObjectId(record.userId),
+    user: mongoose.Types.ObjectId(user.id),
     event: mongoose.Types.ObjectId(record.eventId),
   });
   const result = await newRecord.save();
@@ -17,7 +17,7 @@ const createNewRecord = async (record) => {
 }
 
 const listRecordsByUserId = (userId, populate) => {
-  if(!!populate) {
+  if(populate && populate.toLowerCase() === 'true') {
     return Record.find({ user: userId }).populate({
       path: 'event',
       populate: {

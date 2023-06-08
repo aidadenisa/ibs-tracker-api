@@ -1,7 +1,8 @@
 import { connectDB } from './db/connection.js';
 import cors from 'cors';
 import express from 'express';
-import { errorHandler } from './utils/middleware.js';
+import { errorHandler } from './middleware/middleware.js';
+import { authorize } from './middleware/authorization.js';
 import eventRouter from './controllers/events.js';
 import recordRouter from './controllers/records.js';
 import userRouter from './controllers/users.js';
@@ -22,9 +23,9 @@ app.get('/', async (request, response) => {
 });
 
 app.use('/auth', authRouter);
-app.use('/events', eventRouter);
-app.use('/records', recordRouter);
-app.use('/users', userRouter);
+app.use('/events', authorize, eventRouter);
+app.use('/records', authorize, recordRouter);
+app.use('/users', authorize, userRouter);
 
 // Handler for requests with unknown endpoint
 // app.use(unknownEndpoint)

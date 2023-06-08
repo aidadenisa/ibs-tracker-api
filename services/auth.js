@@ -2,6 +2,7 @@ import User from '../models/user.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { SECRET } from '../utils/config.js';
+import userService from '../services/users.js';
 
 const login = async (email, pass) => {
   const user = await User.findOne({ email });
@@ -14,13 +15,18 @@ const login = async (email, pass) => {
 
   const tokenData = {
     email: user.email,
-    id: user.id
+    userId: user.id
   }
   const token = jwt.sign(tokenData, SECRET);
 
   return { token };
 }
 
+const signup = (data) => {
+  return userService.createNewUser(data);
+}
+
 export default {
   login,
+  signup,
 }

@@ -1,4 +1,4 @@
-import logger from './logger.js';
+import logger from '../utils/logger.js';
 
 // Middleware that manages error handling in one place
 // This is an Express error handler, that has 4 params
@@ -23,6 +23,10 @@ const errorHandler = (error, request, response, next) => {
 
   if(error.message && error.message.match(/Invalid email or password/)) {
     return response.status(401).send({ error: 'Invalid email or password.'});
+  }
+
+  if (error.name === 'TokenExpiredError') {
+    return response.status(401).json({ error: 'Token expired.' });
   }
   next(error);
 }
