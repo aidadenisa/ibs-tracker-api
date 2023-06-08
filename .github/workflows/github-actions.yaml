@@ -16,5 +16,5 @@ jobs:
         run: yarn install
       - name: Run tests 
         env:
-          MONGODB_URI: ${{secrets.MONGODB_URI}}
+          TEST_MONGODB_URI: ${{secrets.MONGODB_URI}}
         run: yarn test
