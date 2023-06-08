@@ -17,4 +17,5 @@ jobs:
       - name: Run tests 
         env:
           TEST_MONGODB_URI: ${{secrets.MONGODB_URI}}
+          SECRET: ${{secrets.SECRET}}
         run: yarn test
