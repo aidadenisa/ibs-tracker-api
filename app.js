@@ -29,7 +29,7 @@ app.use('/users', authorize, userRouter);
 
 // Handler for requests with unknown endpoint
 // app.use(unknownEndpoint)
-// Handler of requests that have errors
+// Handler of requests that have errors 
 app.use(errorHandler);
 
 export default app;
