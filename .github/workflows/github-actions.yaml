@@ -2,19 +2,15 @@ name: pull-request
 on:
   pull_request:
     branches: [ main ]
-
 jobs:
   buildAndTest:
     runs-on: ubuntu-latest
-    environment: test
     steps:
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
       - name: Set up node 
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v2
       - name: Install dependencies
         run: yarn install
       - name: Run tests 
-        env:
-          MONGODB_URI: ${{secrets.MONGODB_URI}}
         run: yarn test
