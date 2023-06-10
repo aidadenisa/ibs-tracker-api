@@ -26,7 +26,7 @@ router.post('/', async (req, res, next) => {
 
 router.put('/:id', async (req, res, next) => {
   if (!req.body && !req.body.eventId) {
-    res.status(400).json({ error: 'You need to specify an event for updating the record.' })
+    return res.status(400).json({ error: 'You need to specify an event for updating the record.' })
   }
   try {
     const result = await recordsService.updateRecordProperties(req.params.id, req.body);

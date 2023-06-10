@@ -15,6 +15,18 @@
       "env": {
         "NODE_ENV": "dev"
       }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch Program",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "program": "${workspaceFolder}/index.js",
+      "env": {
+        "NODE_ENV": "test"
+      }
     }
   ]
 }
