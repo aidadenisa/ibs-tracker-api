@@ -25,8 +25,12 @@ const errorHandler = (error, request, response, next) => {
     return response.status(401).send({ error: 'Invalid email or password.'});
   }
 
-  if (error.name === 'TokenExpiredError') {
+  if(error.name === 'TokenExpiredError') {
     return response.status(401).json({ error: 'Token expired.' });
+  }
+
+  if(error) {
+    return response.status(400).json(error);
   }
   next(error);
 }
