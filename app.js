@@ -7,6 +7,7 @@ import eventRouter from './controllers/events.js';
 import recordRouter from './controllers/records.js';
 import userRouter from './controllers/users.js';
 import authRouter from './controllers/auth.js';
+import categoriesRouter from './controllers/categories.js';
 
 await connectDB();
 
@@ -26,7 +27,7 @@ app.use('/auth', authRouter);
 app.use('/events', authorize, eventRouter);
 app.use('/records', authorize, recordRouter);
 app.use('/users', authorize, userRouter);
-
+app.use('/categories', authorize, categoriesRouter);
 // Handler for requests with unknown endpoint
 // app.use(unknownEndpoint)
 // Handler of requests that have errors 

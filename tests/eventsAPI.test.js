@@ -3,7 +3,9 @@ import supertest from 'supertest';
 import app from '../app.js';
 import Event from '../models/event.js';
 import User from '../models/user.js';
+import Category from '../models/category.js';
 import authService from '../services/auth.js';
+import { seedDB } from '../db/seeds.js';
 
 // initialize the API using the supertest framework
 // by wrapping it in a superagent object
@@ -14,7 +16,12 @@ describe('events', () => {
   let token = '';
 
   beforeAll(async () => {
+    await Event.deleteMany({});
+    await Category.deleteMany({});
     await User.deleteMany({});
+
+    await seedDB();
+
     const newTestUser = {
       firstName: 'Test First',
       lastName: 'Test Last',
