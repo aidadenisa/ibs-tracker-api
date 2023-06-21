@@ -1,6 +1,6 @@
 import Category from '../models/category.js';
 import Event from '../models/event.js';
-import mongoose from 'mongoose';
+import logger from '../utils/logger.js';
 
 const categories = [
   {
@@ -55,25 +55,27 @@ const events = {
 };
 
 
-const seedCategories = async () => {
-  const existingCategories = await Category.find({});
-  if(!existingCategories.length) {
-    return await Category.insertMany(
-      categories.map(c => ({ name: c.name, code: c.name.toUpperCase() }))
-    );
+const seedCategory = async (category, events) => {
+  const eventIds = events.map(event => event._id);
+  const existingCategory = await Category.findOne({ code: category.name.toUpperCase()});
+  if(!existingCategory) {
+    return await (new Category({ 
+      name: category.name, 
+      code: category.name.toUpperCase(),
+      events: [...eventIds]
+    })).save();
   }
-  return existingCategories;
+  return existingCategory;
 }
 
-const seedEvent= async (currentCategories, categoryCode) => {
-  const categoryID = currentCategories.find(e => e.code === categoryCode).toJSON().id;
-  const existingEvents = await Event.find({ category: mongoose.Types.ObjectId(categoryID) });
+const seedEvent= async (categoryCode) => {
+  const existingEvents = await Event.find({ category_code: categoryCode });
   if(!existingEvents.length) {
     return await Event.insertMany(
       events[categoryCode].map( e => ({
         name: e.name,
         code: e.name.toUpperCase(),
-        category: mongoose.Types.ObjectId(categoryID),
+        category_code: categoryCode,
       }))
     );
   }
@@ -81,10 +83,12 @@ const seedEvent= async (currentCategories, categoryCode) => {
 }
 
 const seedDB = async () => {
-  const currentCategories = await seedCategories();
-  await seedEvent(currentCategories, 'SYMPTOM');
-  await seedEvent(currentCategories, 'STOOL');
-  await seedEvent(currentCategories, 'MENSTRUATION');
+  for(let i=0; i < categories.length; i++ ) {
+    const events = await seedEvent(categories[i].name.toUpperCase());
+    try {
+      await seedCategory(categories[i], events);
+    } catch(err) { logger(err) }
+  }
 }
 
 export {
