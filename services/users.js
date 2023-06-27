@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import User from '../models/user.js';
 import logger from '../utils/logger.js';
+import recordService from './records.js';
 
 const getUserById = (userId, populate) => {
   if(populate && populate.toLowerCase() === 'true') {
@@ -26,17 +27,27 @@ const createNewUser = async (user) => {
   return newUser.save();
 }
 
-const updateUserRecordIds = async (_userId, _recordId) => {
+const addRecordIdsToUser = async (_userId, recordIds) => {
   const result = await User.findByIdAndUpdate(_userId, {
-    '$push': { 'records' : _recordId.toString()},
+    '$push': { 'records' : { $each: [...recordIds] } },
   }, {
     'new': true, 
   });
   return result;
 }
 
+const updateUserRecordIds = async (_userId) => {
+  // const records = await Record.find({ user: _userId });
+  const records = await recordService.listRecordsByUserId(_userId.toString(), false);
+  
+  await User.findByIdAndUpdate(_userId, {
+    'records': records.map(record => record._id.toString())
+  })
+}
+
 export default {
   createNewUser,
   getUserById,
+  addRecordIdsToUser,
   updateUserRecordIds,
 }
