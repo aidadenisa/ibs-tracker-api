@@ -17,11 +17,15 @@ const events = {
     {
       name: 'Bloating',
     },{
-      name: 'Heartburn',
+      name: 'Burping',
     },{
       name: 'Reflux',
     },{
-      name: 'Burning',
+      name: 'Gas',
+    },{
+      name: 'Nausea',
+    },{
+      name: 'Heartburn',
     },{
       name: 'Cramps',
     },{
@@ -34,6 +38,10 @@ const events = {
       name: 'Constipation',
     },{
       name: 'Diarrhea',
+    },{
+      name: 'Pelvic Pain',
+    },{
+      name: 'Pelvic Burning',
     },
   ],
   'STOOL': [
@@ -47,9 +55,11 @@ const events = {
   ],
   'MENSTRUATION': [
     {
-      name: 'Period Start',
+      name: 'Light',
     },{
-      name: 'Period End',
+      name: 'Normal',
+    },{
+      name: 'Heavy',
     },
   ],
 };
