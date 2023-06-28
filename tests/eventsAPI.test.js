@@ -11,7 +11,7 @@ import { seedDB } from '../db/seeds.js';
 // by wrapping it in a superagent object
 const api = supertest(app);
 
-describe('events', () => {
+describe('GET /events', () => {
 
   let token = '';
 

@@ -30,6 +30,17 @@ const listRecordsByUserId = (userId, populate) => {
   return Record.find({ user: userId });
 }
 
+const listRecordsForDate = async (userId, date) => {
+  const result = await Record.find({
+    user: mongoose.Types.ObjectId(userId),
+    date: {
+      $gte: startOfDay(new Date(date)), 
+      $lt: endOfDay(new Date(date)),
+    }
+  })
+  return result
+}
+
 const updateRecordProperties = async (recordId, properties) => {
   // Add properties we allow update of. For now it's just the event. 
   const updatedProperties = {
@@ -76,5 +87,6 @@ export default {
   listRecordsByUserId,
   updateRecordProperties,
   deleteRecord,
-  updateRecordsForDate
+  listRecordsForDate,
+  updateRecordsForDate,
 }
