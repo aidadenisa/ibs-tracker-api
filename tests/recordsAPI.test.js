@@ -11,6 +11,7 @@ import Record from '../models/record.js';
 import authService from '../services/auth.js';
 import eventService from '../services/events.js';
 import recordService from '../services/records.js';
+import userService from '../services/users.js';
 
 const api = supertest(app);
 
@@ -23,7 +24,7 @@ const api = supertest(app);
 describe('POST /records/multiple', () => {
   let token;
   let events;
-  let userId; 
+  let userId;
 
   const BASE_URL = '/records/multiple';
   beforeAll(async () => {
@@ -65,7 +66,7 @@ describe('POST /records/multiple', () => {
         expect(response.error).toBeDefined();
         expect(response.error.text).toContain('Missing required properties');
       })
-      await api
+    await api
       .post(BASE_URL)
       .set('Authorization', `Bearer ${token}`)
       .send({
@@ -76,7 +77,7 @@ describe('POST /records/multiple', () => {
         expect(response.error).toBeDefined();
         expect(response.error.text).toContain('Missing required properties');
       })
-      await api
+    await api
       .post(BASE_URL)
       .set('Authorization', `Bearer ${token}`)
       .send({
@@ -100,20 +101,94 @@ describe('POST /records/multiple', () => {
         selectedEventsIds
       })
       .expect(200)
-    
+
     const records = await recordService.listRecordsForDate(userId, dateISO);
     expect(records.length).toBeGreaterThanOrEqual(selectedEventsIds.length);
 
     const eventsIdsFromRecords = records.map(record => record.event.toString());
 
-    for (let i = 0; i < selectedEventsIds.length; i++ ) {
+    for (let i = 0; i < selectedEventsIds.length; i++) {
       expect(eventsIdsFromRecords).toContain(selectedEventsIds[i])
     }
 
   })
-  // test('overwrites previous records on that date when necessary', () => {})
-  // test('saves record ids in the user object', () => {})
-  // test('overwrites previous record ids on the user object', () => {})
+  test('overwrites previous records on that date when necessary', async () => {
+    const dateISO = (new Date()).toISOString();
+    const existingEventsIds = events.map(event => event.id).filter((event, index) => index < 4);
+    const selectedEventsIds = events.map(event => event.id).filter((event, index) => index % 2 === 0);
+    const idsToBeRemoved = existingEventsIds.filter(id => selectedEventsIds.indexOf(id) === -1)
+
+    await recordService.updateRecordsForDate(userId, dateISO, existingEventsIds);
+
+    await api
+      .post(BASE_URL)
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        dateISO,
+        selectedEventsIds
+      })
+      .expect(200)
+
+    const recordsAfterUpdate = await recordService.listRecordsForDate(userId, dateISO);
+
+    expect(recordsAfterUpdate.length).toBe(selectedEventsIds.length)
+    for (let i = 0; i < idsToBeRemoved.length; i++) {
+      expect(recordsAfterUpdate).not.toContain(idsToBeRemoved[i])
+    }
+  })
+
+  test('saves record ids in the user object', async () => {
+    const dateISO = (new Date()).toISOString();
+    const selectedEventsIds = events.map(event => event.id).filter((event, index) => index % 2 === 0);
+
+    await api
+      .post(BASE_URL)
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        dateISO,
+        selectedEventsIds
+      })
+      .expect(200)
+      .expect(async result => {
+
+        const records = result.body;
+        const userInfo = await userService.getUserById(userId);
+        const userInfoRecordsIds = userInfo.records.map(record => record._id.toString())
+
+        for (let i = 0; i < records.length; i++) {
+          expect(userInfoRecordsIds).toContain(records[i].id)
+        }
+      })
+
+
+  })
+
+  test('overwrites previous record ids on the user object', async () => {
+    const dateISO = (new Date()).toISOString();
+    const existingEventsIds = events.map(event => event.id).filter((event, index) => index < 4);
+    const selectedEventsIds = events.map(event => event.id).filter((event, index) => index % 2 === 0);
+
+    const existingRecords = await recordService.updateRecordsForDate(userId, dateISO, existingEventsIds);
+
+    await api
+      .post(BASE_URL)
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        dateISO,
+        selectedEventsIds
+      })
+      .expect(200)
+
+    const recordIdsToBeRemoved = existingRecords.filter(
+      record => selectedEventsIds.indexOf(record.event.toString()) === -1
+    ).map(record => record.id);
+
+    const userInfo = await userService.getUserById(userId);
+
+    for (let i = 0; i < recordIdsToBeRemoved.length; i++) {
+      expect(userInfo.records).not.toContain(recordIdsToBeRemoved[i].id)
+    }
+  })
 })
 
 afterAll(() => {

@@ -60,7 +60,6 @@ const updateRecordsForDate = async (userId, date, selectedEventsIds) => {
   const _userId = mongoose.Types.ObjectId(userId);
   const dateObj = new Date(date);
 
-
   // TODO: MAKE THIS A TRANSACTION
   await Record.deleteMany({
     user: _userId,
@@ -75,7 +74,7 @@ const updateRecordsForDate = async (userId, date, selectedEventsIds) => {
       date: new Date(date),
       event: mongoose.Types.ObjectId(eventId),
       user: _userId,
-    })), { new: true }
+    })), { ordered: true }
   );
   await userService.updateUserRecordIds(_userId);
 
