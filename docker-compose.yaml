@@ -1,0 +1,8 @@
+services:
+  ibs-tracker-api:
+    image: 'aidadenisa/ibs-tracker-api:1.0'
+    environment: 
+      - MONGODB_URI=${MONGODB_URI}
+      - SECRET=${SECRET}
+    ports:
+      - '3031:3030'
