@@ -24,6 +24,17 @@ router.post('/', async (req, res, next) => {
   } catch (err) { next(err) };
 });
 
+router.post('/multiple', async (req, res, next) => {
+  const data = req.body;
+  if (!data || !data.dateISO || !data.selectedEventsIds) {
+    return res.status(400).json({ error: 'Missing required properties: dateISO or selectedEventsIds'})
+  }
+  try {
+    const result = await recordsService.updateRecordsForDate(req.user.id, data.dateISO, data.selectedEventsIds);
+    return res.json(result);
+  } catch (err) { next(err) };
+})
+
 router.put('/:id', async (req, res, next) => {
   if (!req.body && !req.body.eventId) {
     return res.status(400).json({ error: 'You need to specify an event for updating the record.' })
