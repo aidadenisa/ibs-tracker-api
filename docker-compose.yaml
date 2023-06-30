@@ -1,8 +1,23 @@
 services:
   ibs-tracker-api:
     image: 'aidadenisa/ibs-tracker-api:1.0'
+    restart: always
     environment: 
       - MONGODB_URI=${MONGODB_URI}
       - SECRET=${SECRET}
+      - PORT=${PORT}
     ports:
-      - '3031:3030'
+      - 3031:${PORT}
+    links:
+      - mongo
+  mongo:
+    image: mongo 
+    container_name: 'ibs-mongo'
+    restart: always
+    ports: 
+      - '27017:27017'
+    volumes:
+      - mongo-volume:/data/db
+volumes:
+  mongo-volume:
+    driver: local
