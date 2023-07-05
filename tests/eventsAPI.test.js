@@ -16,11 +16,7 @@ describe('GET /events', () => {
   let token = '';
 
   beforeAll(async () => {
-    await Event.deleteMany({});
-    await Category.deleteMany({});
     await User.deleteMany({});
-
-    await seedDB();
 
     const newTestUser = {
       firstName: 'Test First',
@@ -71,6 +67,7 @@ describe('GET /events', () => {
 
 })
 
-afterAll(() => {
+afterAll(async () => {
+  await User.deleteMany({});
   mongoose.connection.close();
 })
