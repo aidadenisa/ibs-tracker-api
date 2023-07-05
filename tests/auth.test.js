@@ -6,18 +6,20 @@ import app from '../app';
 
 const api = supertest(app);
 
+const testUser = {
+  firstName: 'Test First',
+  lastName: 'Test Last',
+  pass: '123456',
+  email: 'initial@test.com',
+  hasMenstruationSupport: true,
+};
+
 describe('auth: user', () => {
 
-  // delete all users and create a dummy initial user
-  beforeEach(async () => {
+  // delete users with the test email and signup new user with the test data
+  beforeAll(async () => {
     await User.deleteMany({});
-    await authService.signup({
-      firstName: 'Test First',
-      lastName: 'Test Last',
-      pass: '123456',
-      email: 'initial@test.com',
-      hasMenstruationSupport: true,
-    });
+    await authService.signup(testUser);
   }, 100000);
 
   test('is not created if the email is not unique', async () => {
@@ -42,6 +44,7 @@ describe('auth: user', () => {
   }, 100000)
 
   test('is created if the email is unique', async () => {
+    //Arange
     const initialUsers = await User.find({});
     const newUser = {
       firstName: 'Test First 2',
@@ -51,11 +54,13 @@ describe('auth: user', () => {
       hasMenstruationSupport: false,
     };
 
+    //Act
     const result = await api.post('/auth/signup')
       .send(newUser)
       .expect(200)
       .expect('Content-Type', /application\/json/);
 
+    //Asses
     expect(result.body).toBeDefined();
     expect(result.body.id).toBeDefined();
     expect(result.body.id).not.toBeNull();
@@ -67,9 +72,12 @@ describe('auth: user', () => {
     expect(initialUsers.map(user => user.id).join(' ')).not.toContain(result.body.id);
     expect(updatedUsers.map(user => user.id).join(' ')).toContain(result.body.id);
 
+    //Teardown
+    await User.deleteOne({ email: 'new@test.com'});
   })
 })
 
-afterAll( () => {
+afterAll( async () => {
+  await User.deleteMany({});
   mongoose.connection.close();
 })
