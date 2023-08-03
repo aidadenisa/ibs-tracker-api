@@ -45,9 +45,15 @@ const updateUserRecordIds = async (_userId) => {
   })
 }
 
+const updateUser = (_userId, updatedProperties) => {
+  // properties that are not part of the schema will be ignored
+  return User.findByIdAndUpdate(_userId, updatedProperties, { new: true } );
+}
+
 export default {
   createNewUser,
   getUserById,
   addRecordIdsToUser,
   updateUserRecordIds,
+  updateUser,
 }
