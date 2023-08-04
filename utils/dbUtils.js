@@ -7,6 +7,7 @@ const prettifyId = (schema) => {
       delete returnedObject.__v
       //the password should not be returned
       returnedObject.hash && delete returnedObject.hash
+      returnedObject.accessEndDate && delete returnedObject.accessEndDate
       return returnedObject;
     }
   })

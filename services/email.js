@@ -17,8 +17,9 @@ const sendEmail = async (provider, params) => {
 const sendOTPEmail = async (recipient, otp, timeToExpire) => {
 
   // shortcircuit the email for now, console.log OTP for local development
-  if(NODE_ENV === 'dev') {
+  if(NODE_ENV === 'dev' || NODE_ENV === 'test') {
     console.log('otp: ', otp);
+    return;
   }
 
   try { 

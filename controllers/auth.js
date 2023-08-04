@@ -20,8 +20,8 @@ router.post('/signup', async (req, res, next) => {
     return res.status(400).json({ error: 'You need to specify an email for the user' });
   }
   try {
-    await authService.signup(data);
-    res.status(201).send();
+    const result = await authService.signup(data);
+    res.status(201).json(result);
   } catch(err) { next(err) };
 });
 
