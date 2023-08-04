@@ -32,7 +32,7 @@ const listRecordsByUserId = (userId, populate) => {
 
 const listRecordsForDate = async (userId, date) => {
   const result = await Record.find({
-    user: mongoose.Types.ObjectId(userId),
+    user: new mongoose.Types.ObjectId(userId),
     date: {
       $gte: startOfDay(new Date(date)), 
       $lt: endOfDay(new Date(date)),
@@ -57,7 +57,7 @@ const deleteRecord = async (recordId) => {
 
 const updateRecordsForDate = async (userId, date, selectedEventsIds) => {
   let results;
-  const _userId = mongoose.Types.ObjectId(userId);
+  const _userId = new mongoose.Types.ObjectId(userId);
   const dateObj = new Date(date);
 
   // TODO: MAKE THIS A TRANSACTION
@@ -72,7 +72,7 @@ const updateRecordsForDate = async (userId, date, selectedEventsIds) => {
   results = await Record.insertMany(
     selectedEventsIds.map(eventId => ({
       date: new Date(date),
-      event: mongoose.Types.ObjectId(eventId),
+      event: new mongoose.Types.ObjectId(eventId),
       user: _userId,
     })), { ordered: true }
   );

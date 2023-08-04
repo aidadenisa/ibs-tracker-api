@@ -6,6 +6,7 @@ import User from '../models/user.js';
 import Category from '../models/category.js';
 import authService from '../services/auth.js';
 import { seedDB } from '../db/seeds.js';
+import testApi from '../utils/testApi.js';
 
 // initialize the API using the supertest framework
 // by wrapping it in a superagent object
@@ -16,21 +17,16 @@ describe('GET /events', () => {
   let token = '';
 
   beforeAll(async () => {
-    await Event.deleteMany({});
-    await Category.deleteMany({});
     await User.deleteMany({});
-
-    await seedDB();
 
     const newTestUser = {
       firstName: 'Test First',
       lastName: 'Test Last',
-      pass: '123456',
       email: 'initial@test.com',
       hasMenstruationSupport: true,
     };
-    await authService.signup(newTestUser);
-    token = (await authService.login(newTestUser.email, newTestUser.pass)).token;
+    const { otp } = await testApi.signup(newTestUser);
+    token = (await testApi.validateOTP(newTestUser.email, otp)).token;
   }, 100000);
 
   test('are returned as JSON with status 200', async () => {
@@ -71,6 +67,7 @@ describe('GET /events', () => {
 
 })
 
-afterAll(() => {
+afterAll(async () => {
+  await User.deleteMany({});
   mongoose.connection.close();
 })

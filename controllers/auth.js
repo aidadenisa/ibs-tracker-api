@@ -4,13 +4,13 @@ import authService from '../services/auth.js';
 const router = express.Router();
 
 router.post('/login', async (req, res, next) => {
-  const { email, pass } = req.body;
-  if(!email || !pass) {
+  const { email } = req.body;
+  if(!email) {
     return res.status(400).json({ error: 'Email and password required.'});
   }
   try {
-    const result = await authService.login(email, pass);
-    res.json(result);
+    await authService.login(email);
+    res.status(200).send();
   } catch(err) { next(err) };
 });
 
@@ -21,9 +21,19 @@ router.post('/signup', async (req, res, next) => {
   }
   try {
     const result = await authService.signup(data);
-    res.json(result);
+    res.status(201).json(result);
   } catch(err) { next(err) };
 });
 
+router.post('/validate-otp', async (req, res, next) => {
+  const { email, otp } = req.body;
+  if(!email || !otp) {
+    return res.status(400).json({ error: 'Email and otp required.'});
+  }
+  try {
+    const result = await authService.validateOTP(email, otp);
+    res.json(result);
+  } catch(err) { next(err) };
+});
 
 export default router;

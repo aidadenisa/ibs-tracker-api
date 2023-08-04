@@ -13,15 +13,19 @@ const connectDB = async () => {
     console.log('connected to MongoDB');
     
     //Populate DB with seeds
-    await seedDB();
-  
-    return mongoose.connect
+    return await seedDB();
   } catch(error) {
     console.log('error connecting to MongoDB:', error.message);
+    console.log(error);
     return;
   };
 
 }
+
+process.on('exit', function() {
+  // Add shutdown logic here.
+  mongoose.connection.close();
+});
 
 export {
   connectDB
