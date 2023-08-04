@@ -10,7 +10,6 @@ const login = async (email) => {
   const user = await User.findOne({ email });
   if(!user) throw new Error('User not found.');
 
-  // const { otpKey } = await refreshUserOTP(user);
   const otp = await refreshUserOTP(user);
 
   otpService.sendOTP(user, otp, userService.LOGIN_WINDOW);

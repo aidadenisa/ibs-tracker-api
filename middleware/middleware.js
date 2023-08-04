@@ -20,8 +20,12 @@ const errorHandler = (error, request, response, next) => {
     return response.status(404).send({ error: 'User not found.' });
   }
 
-  if(error.message && error.message.match(/Invalid email or password/)) {
-    return response.status(401).send({ error: 'Invalid email or password.'});
+  if(error.message && error.message.match(/Invalid OTP/)) {
+    return response.status(401).send({ error: 'Invalid OTP.'});
+  }
+
+  if(error.message && error.message.match(/OTP has expired/)) {
+    return response.status(401).send({ error: 'OTP has expired.'});
   }
 
   if(error.name === 'TokenExpiredError') {

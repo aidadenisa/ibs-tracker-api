@@ -7,11 +7,6 @@ const numbers = '0123456789';
 const charsLower = 'abcdefghijklmnopqrstuvwxyz';
 const alphanumeric = numbers + charsLower + charsLower.toUpperCase();
 
-// The problem is that I do not want the user to set a password
-// I want them to log in using a random generated password 
-// every time they want to log in
-// I want the password to be long and complex so that it won't be easy to guess 
-
 const generateSecret = () => {
 
   const randomBytes = crypto.randomBytes(16);
@@ -36,11 +31,10 @@ const verifyOTP = async (inputOTP, userOTP, expiryDate) => {
     throw new Error('Invalid OTP');
   }
   if((new Date()).getTime() > (new Date(expiryDate)).getTime()) {
-    throw new Error('OTP has expired.');
+    throw new Error('OTP has expired');
   }
 
   const isValid = await bcrypt.compare(inputOTP, userOTP);
-  console.log(isValid)
   
   return isValid;
 }
