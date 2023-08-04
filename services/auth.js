@@ -11,19 +11,18 @@ const login = async (email) => {
   if(!user) throw new Error('User not found.');
 
   // const { otpKey } = await refreshUserOTP(user);
-  const newUser = await refreshUserOTP(user);
-  console.log(newUser);
+  const otp = await refreshUserOTP(user);
 
-  otpService.sendOTP(user.email, user.otpKey);
+  otpService.sendOTP(user.email, otp);
 
-  return newUser;
+  return;
 }
 
 const signup = async (data) => {
-  data.otpKey = otpService.generateSecret();
+  data.pass = otpService.generateSecret();
   const userData = await userService.createNewUser(data);
   console.log(userData);
-  otpService.sendOTP(data.email, data.otpKey);
+  otpService.sendOTP(userData.email, data.pass);
   return userData;
 }
 
@@ -31,11 +30,13 @@ const validateOTP = async (email, inputOTP) => {
   const user = await User.findOne({ email });
   if(!user) throw new Error('User not found.');
 
-  const isValid = otpService.verifyOTP(inputOTP, user.otpKey);
+  const isValid = await otpService.verifyOTP(inputOTP, user.hash, user.accessEndDate);
 
   if(!isValid) {
     throw new Error('Invalid OTP.');
   }
+
+  userService.resetUserOTP(user._id);
 
   const tokenData = {
     email: user.email,
@@ -46,10 +47,10 @@ const validateOTP = async (email, inputOTP) => {
   return { token };
 }
 
-const refreshUserOTP = (user) => {
-  user.otpKey = otpService.generateSecret();
-
-  return userService.updateUser(user._id, { otpKey: user.otpKey });
+const refreshUserOTP = async ( user ) => {
+  const otp = otpService.generateSecret();
+  await userService.updateUserOTP(user._id, otp);
+  return otp;
 }
 
 export default {
