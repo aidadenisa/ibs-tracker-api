@@ -16,7 +16,8 @@ const UserSchema = new mongoose.Schema({
   records: [{
     type: mongoose.Schema.ObjectId,
     ref: 'Record',
-  }]
+  }],
+  accessEndDate: Date
 });
 prettifyId(UserSchema);
 // verify if the values which should be unique are valid

@@ -3,7 +3,7 @@
 # Specify the base image with Node.js pre-installed
 # Docker Alpine is the “Dockerized” version of Alpine Linux, 
 # a Linux distribution known for being exceptionally lightweight and secure.
-FROM node:16-alpine
+FROM node:18-alpine
 
 # Set the working directory inside the container
 # This also switches the current directory to /app

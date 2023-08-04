@@ -13,13 +13,13 @@ import eventService from '../services/events.js';
 import recordService from '../services/records.js';
 import userService from '../services/users.js';
 import records from '../services/records.js';
+import testApi from '../utils/testApi.js';
 
 const api = supertest(app);
 
 const testUser = {
   firstName: 'Test First',
   lastName: 'Test Last',
-  pass: '123456',
   email: 'initial@test.com',
   hasMenstruationSupport: true,
 };
@@ -37,8 +37,8 @@ describe('Records API', () => {
       await User.deleteMany({});
       await Record.deleteMany({});
 
-      await authService.signup(testUser);
-      token = (await authService.login(testUser.email, testUser.pass)).token;
+      const { otp } = await testApi.signup(testUser);
+      token = (await testApi.validateOTP(testUser.email, otp)).token;
 
       selectedEventsIds = (await eventService.listEvents())
         .filter((event, index) => index < 4)
@@ -84,9 +84,9 @@ describe('Records API', () => {
       await User.deleteMany({});
       await Record.deleteMany({});
 
-      const userInfo = await authService.signup(testUser);
-      userId = userInfo.id;
-      token = (await authService.login(testUser.email, testUser.pass)).token;
+      const { otp, id} = await testApi.signup(testUser);
+      userId = id;
+      token = (await testApi.validateOTP(testUser.email, otp)).token;
 
       events = await eventService.listEvents();
     })

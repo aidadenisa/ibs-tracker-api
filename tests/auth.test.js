@@ -9,7 +9,6 @@ const api = supertest(app);
 const testUser = {
   firstName: 'Test First',
   lastName: 'Test Last',
-  pass: '123456',
   email: 'initial@test.com',
   hasMenstruationSupport: true,
 };
@@ -27,7 +26,6 @@ describe('auth: user', () => {
     const newUser = {
       firstName: 'Test First',
       lastName: 'Test Last',
-      pass: '123456',
       email: 'initial@test.com',
       hasMenstruationSupport: true,
     };
@@ -49,7 +47,6 @@ describe('auth: user', () => {
     const newUser = {
       firstName: 'Test First 2',
       lastName: 'Test Last 2',
-      pass: '1234567',
       email: 'new@test.com',
       hasMenstruationSupport: false,
     };
@@ -57,7 +54,7 @@ describe('auth: user', () => {
     //Act
     const result = await api.post('/auth/signup')
       .send(newUser)
-      .expect(200)
+      .expect(201)
       .expect('Content-Type', /application\/json/);
 
     //Asses

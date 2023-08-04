@@ -2,6 +2,9 @@ import bcrypt from 'bcrypt';
 import User from '../models/user.js';
 import logger from '../utils/logger.js';
 import recordService from './records.js';
+import { addMinutes } from 'date-fns';
+
+const LOGIN_WINDOW = 2; // minutes
 
 const getUserById = (userId, populate) => {
   if(populate && populate.toLowerCase() === 'true') {
@@ -10,9 +13,15 @@ const getUserById = (userId, populate) => {
   return User.findById(userId);
 }
 
-const createNewUser = async (user) => {
+const hashPassword = async (pass) => {
   const saltRounds = 10;
-  const passwordHash = await bcrypt.hash(user.pass, saltRounds);
+  const passwordHash = await bcrypt.hash(pass, saltRounds);
+  return passwordHash;
+}
+
+const createNewUser = async (user) => {
+
+  const passwordHash = await hashPassword(user.pass)
 
   const newUser = new User({
     firstName: user.firstName,
@@ -22,6 +31,7 @@ const createNewUser = async (user) => {
     hasMenstruationSupport: user.hasMenstruationSupport,
     registeredOn: new Date(),
     records: [],
+    accessEndDate: addMinutes(new Date(), LOGIN_WINDOW)
   });
 
   return newUser.save();
@@ -45,9 +55,36 @@ const updateUserRecordIds = async (_userId) => {
   })
 }
 
+const updateUser = (_userId, updatedProperties) => {
+  if(updatedProperties['hash']) {
+    delete updatedProperties['hash']
+  }
+  // properties that are not part of the schema will be ignored
+  return User.findByIdAndUpdate(_userId, updatedProperties, { new: true } );
+}
+
+const updateUserOTP = async (_userId, otp) => {
+  const hash = await hashPassword(otp);
+  return User.findByIdAndUpdate(_userId, {
+    hash,
+    accessEndDate: addMinutes(new Date(), LOGIN_WINDOW)
+  }, { new: true } );
+}
+
+const resetUserOTP = async (_userId) => {
+  return User.findByIdAndUpdate(_userId, {
+    hash: null,
+    accessEndDate: null
+  }, { new: true } );
+}
+
 export default {
+  LOGIN_WINDOW,
   createNewUser,
   getUserById,
   addRecordIdsToUser,
   updateUserRecordIds,
+  updateUser,
+  updateUserOTP,
+  resetUserOTP,
 }
