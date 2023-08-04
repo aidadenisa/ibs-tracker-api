@@ -13,7 +13,7 @@ const login = async (email) => {
   // const { otpKey } = await refreshUserOTP(user);
   const otp = await refreshUserOTP(user);
 
-  otpService.sendOTP(user.email, otp);
+  otpService.sendOTP(user, otp, userService.LOGIN_WINDOW);
 
   return;
 }
@@ -21,8 +21,7 @@ const login = async (email) => {
 const signup = async (data) => {
   data.pass = otpService.generateSecret();
   const userData = await userService.createNewUser(data);
-  console.log(userData);
-  otpService.sendOTP(userData.email, data.pass);
+  otpService.sendOTP(userData, data.pass, userService.LOGIN_WINDOW);
   return userData;
 }
 

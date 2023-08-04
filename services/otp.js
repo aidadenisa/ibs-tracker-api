@@ -1,6 +1,8 @@
 import crypto from 'crypto';
 import bcrypt from 'bcrypt';
 
+import emailService from './email.js';
+
 const numbers = '0123456789';
 const charsLower = 'abcdefghijklmnopqrstuvwxyz';
 const alphanumeric = numbers + charsLower + charsLower.toUpperCase();
@@ -23,11 +25,8 @@ const generateSecret = () => {
   return randomString;
 }
 
-const sendOTP = (email, otp) => {
-
-  console.log('email: ', email);
-  //sendTextMail
-  console.log('otp: ', otp);
+const sendOTP = (user, otp, timeToExpire) => {
+  emailService.sendOTPEmail(user, otp, timeToExpire);
 
 }
 

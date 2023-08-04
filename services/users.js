@@ -4,7 +4,7 @@ import logger from '../utils/logger.js';
 import recordService from './records.js';
 import { addMinutes } from 'date-fns';
 
-const LOGIN_WINDOW = 1; // minutes
+const LOGIN_WINDOW = 2; // minutes
 
 const getUserById = (userId, populate) => {
   if(populate && populate.toLowerCase() === 'true') {
@@ -79,6 +79,7 @@ const resetUserOTP = async (_userId) => {
 }
 
 export default {
+  LOGIN_WINDOW,
   createNewUser,
   getUserById,
   addRecordIdsToUser,
