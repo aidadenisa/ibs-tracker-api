@@ -2,6 +2,7 @@ import sib from 'sib-api-v3-sdk';
 import { NODE_ENV, BREVO_API_KEY } from '../utils/config.js';
 import logger from '../utils/logger.js';
 
+console.log('BREVO_API_KEY: ', BREVO_API_KEY);
 sib.ApiClient.instance.authentications['api-key'].apiKey = BREVO_API_KEY;
 const emailAPI = new sib.TransactionalEmailsApi();
 
