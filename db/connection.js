@@ -1,10 +1,10 @@
 import mongoose from 'mongoose';
 import { seedDB } from './seeds.js';
 import { MONGODB_URI } from '../utils/config.js';
+import logger from '../utils/logger.js';
 
 const connectDB = async () => {
   mongoose.set('strictQuery', false);
-  console.log('MONGODB_URI: ---------',MONGODB_URI)
   try {
     await mongoose.connect(MONGODB_URI, {
       useNewUrlParser: true, 
@@ -15,8 +15,8 @@ const connectDB = async () => {
     //Populate DB with seeds
     return await seedDB();
   } catch(error) {
-    console.log('error connecting to MongoDB:', error.message);
-    console.log(error);
+    console.log('error connecting to MongoDB');
+    logger.error(error);
     return;
   };
 
