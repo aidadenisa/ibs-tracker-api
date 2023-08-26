@@ -6,9 +6,11 @@ import { endOfDay, startOfDay } from 'date-fns';
 
 const createNewRecord = async (record, user) => {
   const newRecord = new Record({
-    date: new Date(),
+    createdOn: new Date(),
     user: mongoose.Types.ObjectId(user.id),
     event: mongoose.Types.ObjectId(record.eventId),
+    timezone: record.timezone,
+    day: record.dayYMD,
   });
   const result = await newRecord.save();
 
@@ -21,21 +23,16 @@ const listRecordsByUserId = (userId, populate) => {
   if (populate && populate.toLowerCase() === 'true') {
     return Record.find({ user: userId }).populate({
       path: 'event',
-      populate: {
-        path: 'category',
-        model: 'Category'
-      }
     });
   }
   return Record.find({ user: userId });
 }
 
-const listRecordsForDate = async (userId, date) => {
+const listRecordsForDate = async (userId, dayYMD) => {
   const result = await Record.find({
     user: new mongoose.Types.ObjectId(userId),
-    date: {
-      $gte: startOfDay(new Date(date)), 
-      $lt: endOfDay(new Date(date)),
+    day: {
+      $eq: dayYMD
     }
   })
   return result
@@ -55,23 +52,23 @@ const deleteRecord = async (recordId) => {
   return await Record.findByIdAndDelete(recordId);
 }
 
-const updateRecordsForDate = async (userId, date, selectedEventsIds) => {
+const updateRecordsForDate = async (userId, dateInfo, selectedEventsIds) => {
   let results;
   const _userId = new mongoose.Types.ObjectId(userId);
-  const dateObj = new Date(date);
 
   // TODO: MAKE THIS A TRANSACTION
   await Record.deleteMany({
     user: _userId,
-    date: {
-      $gte: startOfDay(dateObj), 
-      $lt: endOfDay(dateObj),
-    }
+    day: {
+      $eq: dateInfo.dayYMD, 
+    },
   });
 
   results = await Record.insertMany(
     selectedEventsIds.map(eventId => ({
-      date: new Date(date),
+      day: dateInfo.dayYMD,
+      timezone: dateInfo.timezone,
+      createdOn: new Date(),
       event: new mongoose.Types.ObjectId(eventId),
       user: _userId,
     })), { ordered: true }

@@ -50,6 +50,7 @@ const updateUserRecordIds = async (_userId) => {
   // const records = await Record.find({ user: _userId });
   const records = await recordService.listRecordsByUserId(_userId.toString(), false);
   
+  // TODO: MAKE A DICTIONARY AND UPDATE ONLY THE SPECIFIC DATE
   await User.findByIdAndUpdate(_userId, {
     'records': records.map(record => record._id.toString())
   })

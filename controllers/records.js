@@ -8,7 +8,6 @@ router.get('/', async (req, res, next) => {
   try {
     const result = await recordsService
       .listRecordsByUserId(req.user.id, req.query.populate);
-    logger.info(result)
     res.json(result);
   } catch (err) { next(err) };
 });
@@ -26,11 +25,11 @@ router.post('/', async (req, res, next) => {
 
 router.post('/multiple', async (req, res, next) => {
   const data = req.body;
-  if (!data || !data.dateISO || !data.selectedEventsIds) {
-    return res.status(400).json({ error: 'Missing required properties: dateISO or selectedEventsIds'})
+  if (!data || !data.dateInfo || !data.selectedEventsIds || !data.dateInfo?.dayYMD || !data.dateInfo?.timezone) {
+    return res.status(400).json({ error: 'Missing required properties: dateInfo, dateInfo.dayYMD, dateInfo.timezone or selectedEventsIds'})
   }
   try {
-    const result = await recordsService.updateRecordsForDate(req.user.id, data.dateISO, data.selectedEventsIds);
+    const result = await recordsService.updateRecordsForDate(req.user.id, data.dateInfo, data.selectedEventsIds);
     return res.json(result);
   } catch (err) { next(err) };
 })

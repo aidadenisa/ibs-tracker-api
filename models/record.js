@@ -2,7 +2,9 @@ import mongoose from 'mongoose';
 import { prettifyId } from '../utils/dbUtils.js';
 
 const RecordSchema = new mongoose.Schema({
-  date: Date,
+  createdOn: Date,
+  timezone: String,
+  day: String,
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   event: { type: mongoose.Schema.Types.ObjectId, ref: 'Event' }
 });
