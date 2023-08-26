@@ -15,6 +15,8 @@ import userService from '../services/users.js';
 import records from '../services/records.js';
 import testApi from '../utils/testApi.js';
 
+import { format } from 'date-fns';
+
 const api = supertest(app);
 
 const testUser = {
@@ -23,6 +25,12 @@ const testUser = {
   email: 'initial@test.com',
   hasMenstruationSupport: true,
 };
+const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+const dateInfo = {
+  dayYMD: format(new Date(), 'yyyy-MM-dd'),
+  timezone: timezone
+}
 
 describe('Records API', () => {
 
@@ -47,7 +55,10 @@ describe('Records API', () => {
       await api.post('/records/multiple')
         .set('Authorization', `Bearer ${token}`)
         .send({
-          dateISO: date.toISOString(),
+          dateInfo: {
+            dayYMD: format(date, 'yyyy-MM-dd'),
+            timezone: timezone
+          },
           selectedEventsIds: selectedEventsIds
         })
     })
@@ -64,7 +75,7 @@ describe('Records API', () => {
           expect(records.map(record => record.event)).toStrictEqual(selectedEventsIds)
           
           const lengthOfRecordsOnTheSameDate = records
-            .filter(record => new Date(record.date).toISOString() === date.toISOString());
+            .filter(record => record.day === format(date, 'yyyy-MM-dd'));
           
           expect(lengthOfRecordsOnTheSameDate.length).toBe(selectedEventsIds.length)
         })
@@ -105,7 +116,7 @@ describe('Records API', () => {
         .post(BASE_URL)
         .set('Authorization', `Bearer ${token}`)
         .send({
-          dateISO: (new Date()).toISOString(),
+          dateInfo: dateInfo,
         })
         .expect(400)
         .then((response) => {
@@ -126,19 +137,18 @@ describe('Records API', () => {
     })
 
     test('saves records for a specific date', async () => {
-      const dateISO = (new Date()).toISOString();
       const selectedEventsIds = events.map(event => event.id).filter((event, index) => index % 4 === 0);
 
       await api
         .post(BASE_URL)
         .set('Authorization', `Bearer ${token}`)
         .send({
-          dateISO,
+          dateInfo,
           selectedEventsIds
         })
         .expect(200)
 
-      const records = await recordService.listRecordsForDate(userId, dateISO);
+      const records = await recordService.listRecordsForDate(userId, dateInfo.dayYMD);
       expect(records.length).toBeGreaterThanOrEqual(selectedEventsIds.length);
 
       const eventsIdsFromRecords = records.map(record => record.event.toString());
@@ -150,23 +160,22 @@ describe('Records API', () => {
     })
 
     test('overwrites previous records on that date when necessary', async () => {
-      const dateISO = (new Date()).toISOString();
       const existingEventsIds = events.map(event => event.id).filter((event, index) => index < 4);
       const selectedEventsIds = events.map(event => event.id).filter((event, index) => index % 2 === 0);
       const idsToBeRemoved = existingEventsIds.filter(id => selectedEventsIds.indexOf(id) === -1)
 
-      await recordService.updateRecordsForDate(userId, dateISO, existingEventsIds);
+      await recordService.updateRecordsForDate(userId, dateInfo, existingEventsIds);
 
       await api
         .post(BASE_URL)
         .set('Authorization', `Bearer ${token}`)
         .send({
-          dateISO,
+          dateInfo,
           selectedEventsIds
         })
         .expect(200)
 
-      const recordsAfterUpdate = await recordService.listRecordsForDate(userId, dateISO);
+      const recordsAfterUpdate = await recordService.listRecordsForDate(userId, dateInfo.dayYMD);
 
       expect(recordsAfterUpdate.length).toBe(selectedEventsIds.length)
       for (let i = 0; i < idsToBeRemoved.length; i++) {
@@ -175,14 +184,13 @@ describe('Records API', () => {
     })
 
     test('saves record ids in the user object', async () => {
-      const dateISO = (new Date()).toISOString();
       const selectedEventsIds = events.map(event => event.id).filter((event, index) => index % 2 === 0);
 
       await api
         .post(BASE_URL)
         .set('Authorization', `Bearer ${token}`)
         .send({
-          dateISO,
+          dateInfo,
           selectedEventsIds
         })
         .expect(200)
@@ -201,17 +209,16 @@ describe('Records API', () => {
     })
 
     test('overwrites previous record ids on the user object', async () => {
-      const dateISO = (new Date()).toISOString();
       const existingEventsIds = events.map(event => event.id).filter((event, index) => index < 4);
       const selectedEventsIds = events.map(event => event.id).filter((event, index) => index % 2 === 0);
 
-      const existingRecords = await recordService.updateRecordsForDate(userId, dateISO, existingEventsIds);
+      const existingRecords = await recordService.updateRecordsForDate(userId, dateInfo, existingEventsIds);
 
       await api
         .post(BASE_URL)
         .set('Authorization', `Bearer ${token}`)
         .send({
-          dateISO,
+          dateInfo,
           selectedEventsIds
         })
         .expect(200)
