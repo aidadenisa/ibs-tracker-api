@@ -78,6 +78,15 @@ const updateRecordsForDate = async (userId, dateInfo, selectedEventsIds) => {
   return results;
 }
 
+const createNewRecords = async (records, _userId) => {
+  if(!records || !records.length) return;
+
+  const results = await Record.insertMany(records)
+  await userService.updateUserRecordIds(_userId);
+
+  return results
+}
+
 export default {
   createNewRecord,
   listRecordsByUserId,
@@ -85,4 +94,5 @@ export default {
   deleteRecord,
   listRecordsForDate,
   updateRecordsForDate,
+  createNewRecords,
 }

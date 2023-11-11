@@ -9,10 +9,13 @@ const MONGODB_URI = process.env.NODE_ENV === 'test'
 const SECRET = process.env.SECRET
 const BREVO_API_KEY = process.env.BREVO_API_KEY;
 
+const IMPORT_FROM_BOWELLE = 'bowelle'
+
 export {
   NODE_ENV,
   PORT,
   MONGODB_URI,
   SECRET,
   BREVO_API_KEY,
+  IMPORT_FROM_BOWELLE,
 }

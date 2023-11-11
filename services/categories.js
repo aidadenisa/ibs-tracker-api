@@ -7,6 +7,15 @@ const getCategories = async (populate) => {
   return await Category.find({});
 }
 
+const getCategoryByCode = async (code, populate) => {
+  if(!code) return;
+  if(populate) {
+    return await Category.findOne({ code }).populate('events');
+  }
+  return await Category.findOne({ code })
+}
+
 export default {
-  getCategories
+  getCategories,
+  getCategoryByCode,
 }
