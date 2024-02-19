@@ -2,107 +2,134 @@ import Category from '../models/category.js';
 import Event from '../models/event.js';
 import logger from '../utils/logger.js';
 
-const categories = [
-  {
-    name: 'Symptom',
-  },{
-    name: 'Stool',
-  },{
-    name: 'Menstruation',
-  },
-];
-
-const events = {
-  'SYMPTOM': [
+const categoriesEventsMap = new Map(Object.entries({
+  'Symptom': [
     {
       name: 'Bloating',
-    },{
+    }, {
       name: 'Burping',
-    },{
+    }, {
       name: 'Reflux',
-    },{
+    }, {
       name: 'Gas',
-    },{
+    }, {
       name: 'Nausea',
-    },{
+    }, {
       name: 'Heartburn',
-    },{
+    }, {
       name: 'Cramps',
-    },{
+    }, {
       name: 'Anxiety',
-    },{
+    }, {
       name: 'Insomnia',
-    },{
+    }, {
       name: 'Sweating',
-    },{
+    }, {
       name: 'Constipation',
-    },{
+    }, {
       name: 'Diarrhea',
-    },{
+    }, {
       name: 'Pelvic Pain',
-    },{
+    }, {
       name: 'Pelvic Burning',
     },
   ],
-  'STOOL': [
+  'Stool': [
     {
       name: 'Normal',
-    },{
+    }, {
       name: 'Hard',
-    },{
+    }, {
       name: 'Soft',
     },
   ],
-  'MENSTRUATION': [
+  'Menstruation': [
     {
       name: 'Light',
-    },{
+    }, {
       name: 'Normal',
-    },{
+    }, {
       name: 'Heavy',
     },
   ],
-};
+  'Food': [
+    {
+      name: 'Dairy',
+    }, {
+      name: 'Bread',
+    }, {
+      name: 'Pastry',
+    }, {
+      name: 'Pasta',
+    }, {
+      name: 'Chicken',
+    }, {
+      name: 'Fish',
+    }, {
+      name: 'Beef',
+    }, {
+      name: 'Rice',
+    }, {
+      name: 'Alcohol',
+    }, {
+      name: 'Vegetables',
+    }, {
+      name: 'Legumes',
+    }, {
+      name: 'Fruit',
+    }, {
+      name: 'Desert',
+    }, {
+      name: 'Potatoes',
+    }, {
+      name: 'Plant-Based Milk',
+    }, {
+      name: 'Soup',
+    }, {
+      name: 'Cereals',
+    },
+  ],
+}));
 
 
-const seedCategory = async (category, events) => {
-  const eventIds = events.map(event => event._id);
-  const existingCategory = await Category.findOne({ code: category.name.toUpperCase()});
-  if(!existingCategory) {
-    return await (new Category({ 
-      name: category.name, 
-      code: category.name.toUpperCase(),
-      events: [...eventIds]
+const seedCategory = async (categoryName) => {
+  const existingCategory = await Category.findOne({ code: categoryName.toUpperCase() });
+  const eventsIds = (await Event.find({ category_code: categoryName.toUpperCase() })).map(e => e._id);
+  if (!existingCategory) {
+    return await (new Category({
+      name: categoryName,
+      code: categoryName.toUpperCase(),
+      events: [...eventsIds]
     })).save();
   }
-  return existingCategory;
+  await Category.updateOne({ _id: existingCategory._id }, {
+    events: [...eventsIds]
+  })
 }
 
-const seedEvent= async (categoryCode) => {
+const seedEvents = async (categoryCode, events) => {
   const existingEvents = await Event.find({ category_code: categoryCode });
-  if(!existingEvents.length) {
-    return await Event.insertMany(
-      events[categoryCode].map( e => ({
-        name: e.name,
-        code: e.name.toUpperCase(),
+  const existingEventsNames = existingEvents.map(e => e.name)
+  for (let i = 0; i < events.length; i++) {
+    if (existingEventsNames.indexOf(events[i].name) === -1) {
+      await (new Event({
+        name: events[i].name,
+        code: events[i].name.toUpperCase(),
         category_code: categoryCode,
-      }))
-    );
+      })).save()
+    }
   }
-  return existingEvents;
 }
 
 const seedDB = async () => {
-  for(let i=0; i < categories.length; i++ ) {
-    const events = await seedEvent(categories[i].name.toUpperCase());
-    try {
-      await seedCategory(categories[i], events);
-    } catch(err) { logger(err) }
-  }
+  try {
+    for (const [c, e] of categoriesEventsMap.entries()) {
+      await seedEvents(c.toUpperCase(), e);
+      seedCategory(c)
+    }
+  } catch (err) { logger.error(err) }
 }
 
 export {
   seedDB,
-  categories,
-  events
 };
