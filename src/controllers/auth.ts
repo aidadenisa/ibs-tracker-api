@@ -1,3 +1,4 @@
+// @ts-expect-error TS(2792): Cannot find module 'express'. Did you mean to set ... Remove this comment to see the full error message
 import express from 'express';
 import authService from '../services/auth.js';
 import { loginLimiter, otpValidationLimiter } from '../middleware/rateLimiter.js';
@@ -12,7 +13,7 @@ router.post('/login', loginLimiter, async (req, res, next) => {
   try {
     await authService.login(email);
     res.status(200).send();
-  } catch (err) { next(err) };
+  } catch (err) { next(err) }
 });
 
 router.post('/signup', loginLimiter, async (req, res, next) => {
@@ -23,7 +24,7 @@ router.post('/signup', loginLimiter, async (req, res, next) => {
   try {
     const result = await authService.signup(data);
     res.status(201).json(result);
-  } catch (err) { next(err) };
+  } catch (err) { next(err) }
 });
 
 router.post('/validate-otp', otpValidationLimiter, async (req, res, next) => {
@@ -34,7 +35,7 @@ router.post('/validate-otp', otpValidationLimiter, async (req, res, next) => {
   try {
     const result = await authService.validateOTP(email, otp);
     res.json(result);
-  } catch (err) { next(err) };
+  } catch (err) { next(err) }
 });
 
 export default router;

@@ -1,4 +1,6 @@
+// @ts-expect-error TS(2792): Cannot find module 'express'. Did you mean to set ... Remove this comment to see the full error message
 import express from 'express';
+// @ts-expect-error TS(2792): Cannot find module '../../services/records.js'. Di... Remove this comment to see the full error message
 import recordsService from '../../services/records.js';
 import logger from '../utils/logger.js';
 
@@ -9,7 +11,7 @@ router.get('/', async (req, res, next) => {
     const result = await recordsService
       .listRecordsByUserId(req.user.id, req.query.populate);
     res.json(result);
-  } catch (err) { next(err) };
+  } catch (err) { next(err) }
 });
 
 router.post('/', async (req, res, next) => {
@@ -20,7 +22,7 @@ router.post('/', async (req, res, next) => {
   try {
     const result = await recordsService.createNewRecord(data, req.user);
     res.json(result);
-  } catch (err) { next(err) };
+  } catch (err) { next(err) }
 });
 
 router.post('/multiple', async (req, res, next) => {
@@ -31,7 +33,7 @@ router.post('/multiple', async (req, res, next) => {
   try {
     const result = await recordsService.updateRecordsForDate(req.user.id, data.dateInfo, data.selectedEventsIds);
     return res.json(result);
-  } catch (err) { next(err) };
+  } catch (err) { next(err) }
 })
 
 router.put('/:id', async (req, res, next) => {
@@ -41,14 +43,14 @@ router.put('/:id', async (req, res, next) => {
   try {
     const result = await recordsService.updateRecordProperties(req.params.id, req.body);
     res.json(result);
-  } catch (err) { next(err) };
+  } catch (err) { next(err) }
 })
 
 router.delete('/:id', async (req, res, next) => {
   try {
     await recordsService.deleteRecord(req.params.id);
     res.status(204).end();
-  } catch (err) { next(err) };
+  } catch (err) { next(err) }
 })
 
 export default router;

@@ -9,11 +9,11 @@ const errorHandler = (error, request, response, next) => {
   }
   
   if(error.message && error.message.match(/expected `email` to be unique/)) {
-    return response.status(400).send({ error: 'The email address is already in use. Please use another one.'});
+    return response.status(400).send({ error: 'The email address is already in use. Please use another one.' });
   }
 
   if(error.stack && error.stack.match(/ValidationError/)) {
-    return response.status(400).send({ error: 'The data you send is not valid.'});
+    return response.status(400).send({ error: 'The data you send is not valid.' });
   }
 
   if(error.message && error.message.match(/User not found/)) {
@@ -21,11 +21,11 @@ const errorHandler = (error, request, response, next) => {
   }
 
   if(error.message && error.message.match(/Invalid OTP/)) {
-    return response.status(401).send({ error: 'Invalid OTP.'});
+    return response.status(401).send({ error: 'Invalid OTP.' });
   }
 
   if(error.message && error.message.match(/OTP has expired/)) {
-    return response.status(401).send({ error: 'OTP has expired.'});
+    return response.status(401).send({ error: 'OTP has expired.' });
   }
 
   if(error.name === 'TokenExpiredError') {
@@ -33,7 +33,7 @@ const errorHandler = (error, request, response, next) => {
   }
   
   if (error.name === 'JsonWebTokenError') {
-    return response.status(401).json({ error: 'Invalid or missing JWT. Please log in again.'});
+    return response.status(401).json({ error: 'Invalid or missing JWT. Please log in again.' });
   }
 
   if (error) {

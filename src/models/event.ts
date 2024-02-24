@@ -1,3 +1,4 @@
+// @ts-expect-error TS(2792): Cannot find module 'mongoose'. Did you mean to set... Remove this comment to see the full error message
 import mongoose from 'mongoose';
 import { prettifyId } from '../utils/dbUtils.js';
 

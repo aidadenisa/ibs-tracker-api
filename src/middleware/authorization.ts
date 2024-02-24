@@ -1,3 +1,4 @@
+// @ts-expect-error TS(2792): Cannot find module 'jsonwebtoken'. Did you mean to... Remove this comment to see the full error message
 import jwt from 'jsonwebtoken';
 import { SECRET } from '../utils/config.js';
 import User from '../models/user.js';

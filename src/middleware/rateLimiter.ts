@@ -1,3 +1,4 @@
+// @ts-expect-error TS(2792): Cannot find module 'express-rate-limit'. Did you m... Remove this comment to see the full error message
 import rateLimit from 'express-rate-limit';
 
 // Set up rate limiter for login endpoints

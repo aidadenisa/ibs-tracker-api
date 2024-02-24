@@ -1,3 +1,4 @@
+// @ts-expect-error TS(2792): Cannot find module 'sib-api-v3-sdk'. Did you mean ... Remove this comment to see the full error message
 import sib from 'sib-api-v3-sdk';
 import { NODE_ENV, BREVO_API_KEY } from '../utils/config.js';
 import logger from '../utils/logger.js';
@@ -26,9 +27,9 @@ const sendOTPEmail = async (recipient, otp, timeToExpire) => {
     await sendEmail(EMAIL_PROVIDER__BREVO,
       {
         'subject':'Track IBS - Login using OTP',
-        'sender' : {'email':'no-reply@notifications.trackibs.com', 'name':'Noreply Track IBS'},
-        'replyTo' : {'email':'no-reply@notifications.trackibs.com', 'name':'Noreply Track IBS'},
-        'to' : [{'name': recipient.firstName, 'email': recipient.email}],
+        'sender' : { 'email':'no-reply@notifications.trackibs.com', 'name':'Noreply Track IBS' },
+        'replyTo' : { 'email':'no-reply@notifications.trackibs.com', 'name':'Noreply Track IBS' },
+        'to' : [{ 'name': recipient.firstName, 'email': recipient.email }],
         'htmlContent' : `<html><body>
           <h1>Login using OTP</h1>
           <p>

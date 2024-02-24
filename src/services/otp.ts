@@ -1,4 +1,6 @@
+// @ts-expect-error TS(2792): Cannot find module 'crypto'. Did you mean to set t... Remove this comment to see the full error message
 import crypto from 'crypto';
+// @ts-expect-error TS(2792): Cannot find module 'bcrypt'. Did you mean to set t... Remove this comment to see the full error message
 import bcrypt from 'bcrypt';
 
 import emailService from './email.js';

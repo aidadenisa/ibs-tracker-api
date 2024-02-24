@@ -1,7 +1,9 @@
+// @ts-expect-error TS(2792): Cannot find module 'mongoose'. Did you mean to set... Remove this comment to see the full error message
 import mongoose from 'mongoose';
 import Record from '../models/record.js';
 import logger from '../utils/logger.js';
 import userService from '../services/users.js';
+// @ts-expect-error TS(2792): Cannot find module 'date-fns'. Did you mean to set... Remove this comment to see the full error message
 import { endOfDay, startOfDay } from 'date-fns';
 
 const createNewRecord = async (record, user) => {

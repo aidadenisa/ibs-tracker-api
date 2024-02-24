@@ -1,7 +1,9 @@
+// @ts-expect-error TS(2792): Cannot find module 'bcrypt'. Did you mean to set t... Remove this comment to see the full error message
 import bcrypt from 'bcrypt';
 import User from '../models/user.js';
 import logger from '../utils/logger.js';
 import recordService from './records.js';
+// @ts-expect-error TS(2792): Cannot find module 'date-fns'. Did you mean to set... Remove this comment to see the full error message
 import { addMinutes } from 'date-fns';
 
 const LOGIN_WINDOW = 2; // minutes
