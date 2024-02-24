@@ -1,12 +1,12 @@
 // @ts-expect-error TS(2792): Cannot find module 'jsonwebtoken'. Did you mean to... Remove this comment to see the full error message
 import jwt from 'jsonwebtoken';
-import { SECRET } from '../utils/config.js';
-import User from '../models/user.js';
+import { SECRET } from '../utils/config';
+import User from '../models/user';
 
 const authorize = async (req, res, next) => {
   const bearerToken = req.headers.authorization;
   const token = bearerToken ? bearerToken.split(' ')[1] : '';
-  if (!token || !token.length ) {
+  if (!token || !token.length) {
     return res.status(401).json({ error: 'Missing Authorization Token.' });
   }
 
@@ -20,7 +20,7 @@ const authorize = async (req, res, next) => {
     req.user = user;
     next();
 
-  } catch(err) { next(err) } 
+  } catch (err) { next(err) }
 }
 
 export {

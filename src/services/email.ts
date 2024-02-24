@@ -1,7 +1,6 @@
-// @ts-expect-error TS(2792): Cannot find module 'sib-api-v3-sdk'. Did you mean ... Remove this comment to see the full error message
-import sib from 'sib-api-v3-sdk';
-import { NODE_ENV, BREVO_API_KEY } from '../utils/config.js';
-import logger from '../utils/logger.js';
+const sib = require('@getbrevo/brevo');
+import { NODE_ENV, BREVO_API_KEY } from '../utils/config';
+import logger from '../utils/logger';
 
 sib.ApiClient.instance.authentications['api-key'].apiKey = BREVO_API_KEY;
 const emailAPI = new sib.TransactionalEmailsApi();
@@ -9,7 +8,7 @@ const emailAPI = new sib.TransactionalEmailsApi();
 const EMAIL_PROVIDER__BREVO = 'BREVO';
 
 const sendEmail = async (provider, params) => {
-  if(provider === EMAIL_PROVIDER__BREVO) {
+  if (provider === EMAIL_PROVIDER__BREVO) {
     await emailAPI.sendTransacEmail(params)
   }
 }
@@ -17,20 +16,20 @@ const sendEmail = async (provider, params) => {
 const sendOTPEmail = async (recipient, otp, timeToExpire) => {
 
   // shortcircuit the email for now, console.log OTP for local development
-  if(NODE_ENV === 'dev' || NODE_ENV === 'test') {
+  if (NODE_ENV === 'dev' || NODE_ENV === 'test') {
     console.log('otp: ', otp);
     return;
   }
 
-  try { 
+  try {
     // TODO: refactor this nicer using design patterns
     await sendEmail(EMAIL_PROVIDER__BREVO,
       {
-        'subject':'Track IBS - Login using OTP',
-        'sender' : { 'email':'no-reply@notifications.trackibs.com', 'name':'Noreply Track IBS' },
-        'replyTo' : { 'email':'no-reply@notifications.trackibs.com', 'name':'Noreply Track IBS' },
-        'to' : [{ 'name': recipient.firstName, 'email': recipient.email }],
-        'htmlContent' : `<html><body>
+        'subject': 'Track IBS - Login using OTP',
+        'sender': { 'email': 'no-reply@notifications.trackibs.com', 'name': 'Noreply Track IBS' },
+        'replyTo': { 'email': 'no-reply@notifications.trackibs.com', 'name': 'Noreply Track IBS' },
+        'to': [{ 'name': recipient.firstName, 'email': recipient.email }],
+        'htmlContent': `<html><body>
           <h1>Login using OTP</h1>
           <p>
             Please use this code to login into Track IBS: <strong>{{params.otp}}</strong> 
@@ -42,7 +41,7 @@ const sendOTPEmail = async (recipient, otp, timeToExpire) => {
           <p>All the best, <br/> The Track IBS Team.</p>
           
           </body></html>`,
-        'params' : {
+        'params': {
           'otp': otp,
           'timeToExpire': timeToExpire
         }
@@ -52,7 +51,7 @@ const sendOTPEmail = async (recipient, otp, timeToExpire) => {
   } catch (error) {
     logger.error(error);
   }
-  
+
 }
 
 export default {

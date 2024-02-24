@@ -1,9 +1,7 @@
-// @ts-expect-error TS(2792): Cannot find module 'crypto'. Did you mean to set t... Remove this comment to see the full error message
-import crypto from 'crypto';
-// @ts-expect-error TS(2792): Cannot find module 'bcrypt'. Did you mean to set t... Remove this comment to see the full error message
-import bcrypt from 'bcrypt';
+import * as  crypto from 'crypto';
+import * as bcrypt from 'bcrypt';
 
-import emailService from './email.js';
+import emailService from './email';
 
 const numbers = '0123456789';
 const charsLower = 'abcdefghijklmnopqrstuvwxyz';
@@ -15,7 +13,7 @@ const generateSecret = () => {
 
   let randomString = '';
   // We take the byte value and get the remainder of dividing it by the length of the alphanumeric string
-  for( let i=0; i<randomBytes.length; i++) {
+  for (let i = 0; i < randomBytes.length; i++) {
     randomString += alphanumeric.charAt(randomBytes[i] % alphanumeric.length);
   }
 
@@ -29,20 +27,20 @@ const sendOTP = (user, otp, timeToExpire) => {
 
 const verifyOTP = async (inputOTP, userOTP, expiryDate) => {
 
-  if(!expiryDate || !userOTP || !inputOTP) {
+  if (!expiryDate || !userOTP || !inputOTP) {
     throw new Error('Invalid OTP');
   }
-  if((new Date()).getTime() > (new Date(expiryDate)).getTime()) {
+  if ((new Date()).getTime() > (new Date(expiryDate)).getTime()) {
     throw new Error('OTP has expired');
   }
 
   const isValid = await bcrypt.compare(inputOTP, userOTP);
-  
+
   return isValid;
 }
 
 export default {
-  generateSecret, 
+  generateSecret,
   sendOTP,
   verifyOTP,
 }

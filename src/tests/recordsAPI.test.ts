@@ -1,22 +1,14 @@
-// @ts-expect-error TS(2792): Cannot find module 'jest'. Did you mean to set the... Remove this comment to see the full error message
-import jest from 'jest';
-// @ts-expect-error TS(2792): Cannot find module 'supertest'. Did you mean to se... Remove this comment to see the full error message
-import supertest from 'supertest';
-import app from '../app.js';
-// @ts-expect-error TS(2792): Cannot find module 'mongoose'. Did you mean to set... Remove this comment to see the full error message
+import * as supertest from 'supertest';
+import app from '../app';
 import mongoose from 'mongoose';
 
-import Category from '../models/category.js';
-import User from '../models/user.js';
-import Event from '../models/event.js';
-import Record from '../models/record.js';
+import User from '../models/user';
+import Record from '../models/record';
 
-import authService from '../services/auth.js';
-import eventService from '../services/events.js';
-import recordService from '../services/records.js';
-import userService from '../services/users.js';
-import records from '../services/records.js';
-import testApi from '../utils/testApi.js';
+import eventService from '../services/events';
+import recordService from '../services/records';
+import userService from '../services/users';
+import testApi from '../utils/testApi';
 
 // @ts-expect-error TS(2792): Cannot find module 'date-fns'. Did you mean to set... Remove this comment to see the full error message
 import { format } from 'date-fns';
@@ -36,10 +28,10 @@ const dateInfo = {
   timezone: timezone
 }
 
-// @ts-expect-error TS(2582): Cannot find name 'describe'. Do you need to instal... Remove this comment to see the full error message
+// @ts-expect-error TS(2593): Cannot find name 'describe'. Do you need to instal... Remove this comment to see the full error message
 describe('Records API', () => {
 
-  // @ts-expect-error TS(2582): Cannot find name 'describe'. Do you need to instal... Remove this comment to see the full error message
+  // @ts-expect-error TS(2593): Cannot find name 'describe'. Do you need to instal... Remove this comment to see the full error message
   describe('GET /records ', () => {
 
     let token;
@@ -70,7 +62,7 @@ describe('Records API', () => {
         })
     })
 
-    // @ts-expect-error TS(2582): Cannot find name 'test'. Do you need to install ty... Remove this comment to see the full error message
+    // @ts-expect-error TS(2593): Cannot find name 'test'. Do you need to install ty... Remove this comment to see the full error message
     test('When the user is logged in and has records, returns an array of records of the current user', async () => {
       await api
         .get('/records')
@@ -83,10 +75,10 @@ describe('Records API', () => {
           expect(records.length).toBe(selectedEventsIds.length);
           // @ts-expect-error TS(2304): Cannot find name 'expect'.
           expect(records.map(record => record.event)).toStrictEqual(selectedEventsIds)
-          
+
           const lengthOfRecordsOnTheSameDate = records
             .filter(record => record.day === format(date, 'yyyy-MM-dd'));
-          
+
           // @ts-expect-error TS(2304): Cannot find name 'expect'.
           expect(lengthOfRecordsOnTheSameDate.length).toBe(selectedEventsIds.length)
         })
@@ -94,7 +86,7 @@ describe('Records API', () => {
     // test('result respects the schema', () => { })
   })
 
-  // @ts-expect-error TS(2582): Cannot find name 'describe'. Do you need to instal... Remove this comment to see the full error message
+  // @ts-expect-error TS(2593): Cannot find name 'describe'. Do you need to instal... Remove this comment to see the full error message
   describe('POST /records/multiple', () => {
     let token;
     let events;
@@ -115,7 +107,7 @@ describe('Records API', () => {
       events = await eventService.listEvents();
     })
 
-    // @ts-expect-error TS(2582): Cannot find name 'test'. Do you need to install ty... Remove this comment to see the full error message
+    // @ts-expect-error TS(2593): Cannot find name 'test'. Do you need to install ty... Remove this comment to see the full error message
     test('if missing required properties in the body, returns error and status 400', async () => {
       await api
         .post(BASE_URL)
@@ -156,7 +148,7 @@ describe('Records API', () => {
         })
     })
 
-    // @ts-expect-error TS(2582): Cannot find name 'test'. Do you need to install ty... Remove this comment to see the full error message
+    // @ts-expect-error TS(2593): Cannot find name 'test'. Do you need to install ty... Remove this comment to see the full error message
     test('saves records for a specific date', async () => {
       const selectedEventsIds = events.map(event => event.id).filter((event, index) => index % 4 === 0);
 
@@ -182,7 +174,7 @@ describe('Records API', () => {
 
     })
 
-    // @ts-expect-error TS(2582): Cannot find name 'test'. Do you need to install ty... Remove this comment to see the full error message
+    // @ts-expect-error TS(2593): Cannot find name 'test'. Do you need to install ty... Remove this comment to see the full error message
     test('overwrites previous records on that date when necessary', async () => {
       const existingEventsIds = events.map(event => event.id).filter((event, index) => index < 4);
       const selectedEventsIds = events.map(event => event.id).filter((event, index) => index % 2 === 0);
@@ -209,7 +201,7 @@ describe('Records API', () => {
       }
     })
 
-    // @ts-expect-error TS(2582): Cannot find name 'test'. Do you need to install ty... Remove this comment to see the full error message
+    // @ts-expect-error TS(2593): Cannot find name 'test'. Do you need to install ty... Remove this comment to see the full error message
     test('saves record ids in the user object', async () => {
       const selectedEventsIds = events.map(event => event.id).filter((event, index) => index % 2 === 0);
 
@@ -237,7 +229,7 @@ describe('Records API', () => {
 
     })
 
-    // @ts-expect-error TS(2582): Cannot find name 'test'. Do you need to install ty... Remove this comment to see the full error message
+    // @ts-expect-error TS(2593): Cannot find name 'test'. Do you need to install ty... Remove this comment to see the full error message
     test('overwrites previous record ids on the user object', async () => {
       const existingEventsIds = events.map(event => event.id).filter((event, index) => index < 4);
       const selectedEventsIds = events.map(event => event.id).filter((event, index) => index % 2 === 0);

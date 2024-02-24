@@ -1,8 +1,7 @@
-import Category from '../models/category.js';
-import Event from '../models/event.js';
-import logger from '../utils/logger.js';
+import Category from '../models/category';
+import Event from '../models/event';
+import logger from '../utils/logger';
 
-// @ts-expect-error TS(2550): Property 'entries' does not exist on type 'ObjectC... Remove this comment to see the full error message
 const categoriesEventsMap = new Map(Object.entries({
   'Symptom': [
     {
@@ -125,7 +124,6 @@ const seedEvents = async (categoryCode, events) => {
 const seedDB = async () => {
   try {
     for (const [c, e] of categoriesEventsMap.entries()) {
-      // @ts-expect-error TS(2339): Property 'toUpperCase' does not exist on type 'unk... Remove this comment to see the full error message
       await seedEvents(c.toUpperCase(), e);
       seedCategory(c)
     }

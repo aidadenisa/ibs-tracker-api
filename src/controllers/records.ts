@@ -1,8 +1,7 @@
 // @ts-expect-error TS(2792): Cannot find module 'express'. Did you mean to set ... Remove this comment to see the full error message
 import express from 'express';
-// @ts-expect-error TS(2792): Cannot find module '../../services/records.js'. Di... Remove this comment to see the full error message
-import recordsService from '../../services/records.js';
-import logger from '../utils/logger.js';
+// @ts-expect-error TS(2792): Cannot find module '../../services/records'. Di... Remove this comment to see the full error message
+import recordsService from '../../services/records';
 
 const router = express.Router();
 

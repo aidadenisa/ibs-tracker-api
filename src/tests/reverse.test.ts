@@ -1,6 +1,6 @@
-import { reverse } from '../utils/for_testing.js';
+import { reverse } from '../utils/for_testing';
 
-// @ts-expect-error TS(2582): Cannot find name 'test'. Do you need to install ty... Remove this comment to see the full error message
+// @ts-expect-error TS(2593): Cannot find name 'test'. Do you need to install ty... Remove this comment to see the full error message
 test('reverse of a', () => {
   const result = reverse('a');
   // expect wraps the resulting value into an object that offers a collection of matcher functions, 
@@ -9,7 +9,7 @@ test('reverse of a', () => {
   expect(result).toBe('a');
 });
 
-// @ts-expect-error TS(2582): Cannot find name 'test'. Do you need to install ty... Remove this comment to see the full error message
+// @ts-expect-error TS(2593): Cannot find name 'test'. Do you need to install ty... Remove this comment to see the full error message
 test('reverse of abcde', () => {
   const result = reverse('abcde');
 
@@ -17,7 +17,7 @@ test('reverse of abcde', () => {
   expect(result).toBe('edcba');
 });
 
-// @ts-expect-error TS(2582): Cannot find name 'test'. Do you need to install ty... Remove this comment to see the full error message
+// @ts-expect-error TS(2593): Cannot find name 'test'. Do you need to install ty... Remove this comment to see the full error message
 test('reverse of releveler', () => {
   const result = reverse('releveler');
 

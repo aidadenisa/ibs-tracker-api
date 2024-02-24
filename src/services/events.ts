@@ -1,4 +1,4 @@
-import Event from '../models/event.js';
+import Event from '../models/event';
 
 const listEvents = async () => {
   return await Event.find({});

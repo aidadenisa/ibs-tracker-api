@@ -1,15 +1,12 @@
-// @ts-expect-error TS(2792): Cannot find module 'bcrypt'. Did you mean to set t... Remove this comment to see the full error message
-import bcrypt from 'bcrypt';
-import User from '../models/user.js';
-import logger from '../utils/logger.js';
-import recordService from './records.js';
-// @ts-expect-error TS(2792): Cannot find module 'date-fns'. Did you mean to set... Remove this comment to see the full error message
+import * as bcrypt from 'bcrypt';
+import User from '../models/user';
+import recordService from './records';
 import { addMinutes } from 'date-fns';
 
 const LOGIN_WINDOW = 2; // minutes
 
 const getUserById = (userId, populate) => {
-  if(populate && populate.toLowerCase() === 'true') {
+  if (populate && populate.toLowerCase() === 'true') {
     return User.findById(userId).populate('records');
   }
   return User.findById(userId);
@@ -41,9 +38,9 @@ const createNewUser = async (user) => {
 
 const addRecordIdsToUser = async (_userId, recordIds) => {
   const result = await User.findByIdAndUpdate(_userId, {
-    '$push': { 'records' : { $each: [...recordIds] } },
+    '$push': { 'records': { $each: [...recordIds] } },
   }, {
-    'new': true, 
+    'new': true,
   });
   return result;
 }
@@ -51,7 +48,7 @@ const addRecordIdsToUser = async (_userId, recordIds) => {
 const updateUserRecordIds = async (_userId) => {
   // const records = await Record.find({ user: _userId });
   const records = await recordService.listRecordsByUserId(_userId.toString(), false);
-  
+
   // TODO: MAKE A DICTIONARY AND UPDATE ONLY THE SPECIFIC DATE
   await User.findByIdAndUpdate(_userId, {
     'records': records.map(record => record._id.toString())
@@ -59,11 +56,11 @@ const updateUserRecordIds = async (_userId) => {
 }
 
 const updateUser = (_userId, updatedProperties) => {
-  if(updatedProperties['hash']) {
+  if (updatedProperties['hash']) {
     delete updatedProperties['hash']
   }
   // properties that are not part of the schema will be ignored
-  return User.findByIdAndUpdate(_userId, updatedProperties, { new: true } );
+  return User.findByIdAndUpdate(_userId, updatedProperties, { new: true });
 }
 
 const updateUserOTP = async (_userId, otp) => {
@@ -71,14 +68,14 @@ const updateUserOTP = async (_userId, otp) => {
   return User.findByIdAndUpdate(_userId, {
     hash,
     accessEndDate: addMinutes(new Date(), LOGIN_WINDOW)
-  }, { new: true } );
+  }, { new: true });
 }
 
 const resetUserOTP = async (_userId) => {
   return User.findByIdAndUpdate(_userId, {
     hash: null,
     accessEndDate: null
-  }, { new: true } );
+  }, { new: true });
 }
 
 export default {

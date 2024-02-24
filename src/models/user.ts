@@ -2,7 +2,7 @@
 import mongoose from 'mongoose';
 // @ts-expect-error TS(2792): Cannot find module 'mongoose-unique-validator'. Di... Remove this comment to see the full error message
 import uniqueValidator from 'mongoose-unique-validator';
-import { prettifyId } from '../utils/dbUtils.js';
+import { prettifyId } from '../utils/dbUtils';
 
 const UserSchema = new mongoose.Schema({
   firstName: String,

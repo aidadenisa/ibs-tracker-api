@@ -1,4 +1,3 @@
-// @ts-expect-error TS(2792): Cannot find module 'winston'. Did you mean to set ... Remove this comment to see the full error message
 import { createLogger, transports, format } from 'winston';
 
 const logger = createLogger({
@@ -26,8 +25,7 @@ const logger = createLogger({
 });
 
 const info = (...params) => {
-  // @ts-expect-error TS(2580): Cannot find name 'process'. Do you need to install... Remove this comment to see the full error message
-  if (process.env.NODE_ENV !== 'production') { 
+  if (process.env.NODE_ENV !== 'production') {
     console.log(...params);
   } else {
     logger.info(...params);
@@ -35,8 +33,7 @@ const info = (...params) => {
 }
 
 const error = (...params) => {
-  // @ts-expect-error TS(2580): Cannot find name 'process'. Do you need to install... Remove this comment to see the full error message
-  if (process.env.NODE_ENV !== 'production') { 
+  if (process.env.NODE_ENV !== 'production') {
     console.error(...params)
   } else {
     logger.error(...params);
@@ -44,6 +41,6 @@ const error = (...params) => {
 }
 
 export default {
-  info, 
+  info,
   error,
 }

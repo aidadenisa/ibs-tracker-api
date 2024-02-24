@@ -1,9 +1,7 @@
-// @ts-expect-error TS(2792): Cannot find module 'mongoose'. Did you mean to set... Remove this comment to see the full error message
 import mongoose from 'mongoose';
 import User from '../models/user';
 import authService from '../services/auth';
-// @ts-expect-error TS(2792): Cannot find module 'supertest'. Did you mean to se... Remove this comment to see the full error message
-import supertest from 'supertest';
+import * as supertest from 'supertest';
 import app from '../app';
 
 const api = supertest(app);
@@ -15,7 +13,7 @@ const testUser = {
   hasMenstruationSupport: true,
 };
 
-// @ts-expect-error TS(2582): Cannot find name 'describe'. Do you need to instal... Remove this comment to see the full error message
+// @ts-expect-error TS(2593): Cannot find name 'describe'. Do you need to instal... Remove this comment to see the full error message
 describe('auth: user', () => {
 
   // delete users with the test email and signup new user with the test data
@@ -25,7 +23,7 @@ describe('auth: user', () => {
     await authService.signup(testUser);
   }, 100000);
 
-  // @ts-expect-error TS(2582): Cannot find name 'test'. Do you need to install ty... Remove this comment to see the full error message
+  // @ts-expect-error TS(2593): Cannot find name 'test'. Do you need to install ty... Remove this comment to see the full error message
   test('is not created if the email is not unique', async () => {
     const initialUsers = await User.find({});
     const newUser = {
@@ -38,17 +36,17 @@ describe('auth: user', () => {
       .send(newUser)
       .expect(400)
       .expect('Content-Type', /application\/json/);
-    
+
     // @ts-expect-error TS(2304): Cannot find name 'expect'.
     expect(result.body.error).toContain('The email address is already in use');
 
     const usersAfterSaveAttempt = await User.find({});
     // @ts-expect-error TS(2304): Cannot find name 'expect'.
     expect(usersAfterSaveAttempt).toEqual(initialUsers);
-    
+
   }, 100000)
 
-  // @ts-expect-error TS(2582): Cannot find name 'test'. Do you need to install ty... Remove this comment to see the full error message
+  // @ts-expect-error TS(2593): Cannot find name 'test'. Do you need to install ty... Remove this comment to see the full error message
   test('is created if the email is unique', async () => {
     //Arange
     const initialUsers = await User.find({});
@@ -90,7 +88,7 @@ describe('auth: user', () => {
 })
 
 // @ts-expect-error TS(2304): Cannot find name 'afterAll'.
-afterAll( async () => {
+afterAll(async () => {
   await User.deleteMany({});
   mongoose.connection.close();
 })
