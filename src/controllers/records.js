@@ -1,5 +1,5 @@
 import express from 'express';
-import recordsService from '../services/records.js';
+import recordsService from '../../services/records.js';
 import logger from '../utils/logger.js';
 
 const router = express.Router();
@@ -26,7 +26,7 @@ router.post('/', async (req, res, next) => {
 router.post('/multiple', async (req, res, next) => {
   const data = req.body;
   if (!data || !data.dateInfo || !data.selectedEventsIds || !data.dateInfo?.dayYMD || !data.dateInfo?.timezone) {
-    return res.status(400).json({ error: 'Missing required properties: dateInfo, dateInfo.dayYMD, dateInfo.timezone or selectedEventsIds'})
+    return res.status(400).json({ error: 'Missing required properties: dateInfo, dateInfo.dayYMD, dateInfo.timezone or selectedEventsIds' })
   }
   try {
     const result = await recordsService.updateRecordsForDate(req.user.id, data.dateInfo, data.selectedEventsIds);

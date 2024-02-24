@@ -3,11 +3,11 @@ import cors from 'cors';
 import express from 'express';
 import { errorHandler } from './middleware/middleware.js';
 import { authorize } from './middleware/authorization.js';
-import eventRouter from './controllers/events.js';
-import recordRouter from './controllers/records.js';
-import userRouter from './controllers/users.js';
-import authRouter from './controllers/auth.js';
-import categoriesRouter from './controllers/categories.js';
+import eventRouter from './src/controllers/events.js';
+import recordRouter from './src/controllers/records.js';
+import userRouter from './src/controllers/users.js';
+import authRouter from './src/controllers/auth.js';
+import categoriesRouter from './src/controllers/categories.js';
 
 await connectDB();
 
