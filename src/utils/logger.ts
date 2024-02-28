@@ -24,19 +24,22 @@ const logger = createLogger({
   ],
 });
 
-const info = (...params) => {
+const info = (...params: string[]) => {
+  const [message, ...meta] = params;
   if (process.env.NODE_ENV !== 'production') {
     console.log(...params);
   } else {
-    logger.info(...params);
+    logger.info(message, ...meta);
   }
 }
 
-const error = (...params) => {
+
+const error = (...params: string[]) => {
+  const [message, ...meta] = params;
   if (process.env.NODE_ENV !== 'production') {
     console.error(...params)
   } else {
-    logger.error(...params);
+    logger.error(message, ...meta);
   }
 }
 

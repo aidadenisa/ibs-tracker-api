@@ -1,6 +1,6 @@
-import Category from '../models/category';
-import Event from '../models/event';
-import logger from '../utils/logger';
+import Category from '@/models/category';
+import Event from '@/models/event';
+import logger from '@/utils/logger';
 
 const categoriesEventsMap = new Map(Object.entries({
   'Symptom': [

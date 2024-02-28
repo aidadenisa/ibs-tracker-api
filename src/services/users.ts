@@ -1,6 +1,6 @@
 import * as bcrypt from 'bcrypt';
-import User from '../models/user';
-import recordService from './records';
+import User from '@/models/user';
+import recordService from '@/services/records';
 import { addMinutes } from 'date-fns';
 
 const LOGIN_WINDOW = 2; // minutes

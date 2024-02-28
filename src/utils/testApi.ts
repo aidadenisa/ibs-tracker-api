@@ -1,6 +1,6 @@
-import authService from '../services/auth';
-import otpService from '../services/otp';
-import userService from '../services/users';
+import authService from '@/services/auth';
+import otpService from '@/services/otp';
+import userService from '@/services/users';
 
 const signup = async (userData) => {
   userData.pass = otpService.generateSecret();

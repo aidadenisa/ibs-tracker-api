@@ -1,4 +1,4 @@
-import logger from '../utils/logger';
+import logger from '@/utils/logger';
 
 // Middleware that manages error handling in one place
 // This is an Express error handler, that has 4 params

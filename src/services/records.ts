@@ -1,20 +1,19 @@
 import * as mongoose from 'mongoose';
-import Record from '../models/record';
-import logger from '../utils/logger';
-import userService from '../services/users';
+import Record from '@/models/record';
+import logger from '@/utils/logger';
+import userService from '@/services/users';
 
 const createNewRecord = async (record, user) => {
   const newRecord = new Record({
     createdOn: new Date(),
-    user: mongoose.Types.ObjectId(user.id),
-    event: mongoose.Types.ObjectId(record.eventId),
+    user: user.id,
+    event: record.eventId,
     timezone: record.timezone,
     day: record.dayYMD,
   });
   const result = await newRecord.save();
 
   await userService.addRecordIdsToUser(result.user, [result._id.toString()]);
-  logger.info(result);
   return result;
 }
 
@@ -29,7 +28,7 @@ const listRecordsByUserId = (userId, populate) => {
 
 const listRecordsForDate = async (userId, dayYMD) => {
   const result = await Record.find({
-    user: new mongoose.Types.ObjectId(userId),
+    user: userId,
     day: {
       $eq: dayYMD
     }
@@ -53,7 +52,7 @@ const deleteRecord = async (recordId) => {
 
 const updateRecordsForDate = async (userId, dateInfo, selectedEventsIds) => {
   let results;
-  const _userId = new mongoose.Types.ObjectId(userId);
+  const _userId = userId;
 
   // TODO: MAKE THIS A TRANSACTION
   await Record.deleteMany({
@@ -68,11 +67,11 @@ const updateRecordsForDate = async (userId, dateInfo, selectedEventsIds) => {
       day: dateInfo.dayYMD,
       timezone: dateInfo.timezone,
       createdOn: new Date(),
-      event: new mongoose.Types.ObjectId(eventId),
-      user: _userId,
+      event: eventId,
+      user: userId,
     })), { ordered: true }
   );
-  await userService.updateUserRecordIds(_userId);
+  await userService.updateUserRecordIds(userId);
 
   return results;
 }

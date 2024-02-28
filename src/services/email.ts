@@ -1,6 +1,6 @@
 const sib = require('@getbrevo/brevo');
-import { NODE_ENV, BREVO_API_KEY } from '../utils/config';
-import logger from '../utils/logger';
+import { NODE_ENV, BREVO_API_KEY } from '@/utils/config';
+import logger from '@/utils/logger';
 
 sib.ApiClient.instance.authentications['api-key'].apiKey = BREVO_API_KEY;
 const emailAPI = new sib.TransactionalEmailsApi();

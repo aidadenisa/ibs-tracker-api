@@ -1,7 +1,7 @@
-import Category from '../models/category.js';
+import Category from '@/models/category';
 
 const getCategories = async (populate) => {
-  if(populate && populate.toLowerCase() === 'true') {
+  if (populate && populate.toLowerCase() === 'true') {
     return await Category.find({}).populate('events');
   }
   return await Category.find({});

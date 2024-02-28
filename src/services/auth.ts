@@ -1,8 +1,8 @@
-import User from '../models/user';
+import User from '@/models/user';
 import * as jwt from 'jsonwebtoken';
-import { SECRET } from '../utils/config';
-import userService from '../services/users';
-import otpService from '../services/otp';
+import { SECRET } from '@/utils/config';
+import userService from '@/services/users';
+import otpService from '@/services/otp';
 
 const login = async (email) => {
 

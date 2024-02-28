@@ -1,22 +1,15 @@
-import { connectDB } from './db/connection';
-// @ts-expect-error TS(2792): Cannot find module 'cors'. Did you mean to set the... Remove this comment to see the full error message
+import { connectDB } from '@/db/connection';
 import cors from 'cors';
-// @ts-expect-error TS(2792): Cannot find module 'express'. Did you mean to set ... Remove this comment to see the full error message
 import express from 'express';
-import { errorHandler } from './middleware/middleware';
-import { authorize } from './middleware/authorization';
-// @ts-expect-error TS(2792): Cannot find module './src/controllers/events'. ... Remove this comment to see the full error message
-import eventRouter from './src/controllers/events';
-// @ts-expect-error TS(2792): Cannot find module './src/controllers/records'.... Remove this comment to see the full error message
-import recordRouter from './src/controllers/records';
-// @ts-expect-error TS(2792): Cannot find module './src/controllers/users'. D... Remove this comment to see the full error message
-import userRouter from './src/controllers/users';
-// @ts-expect-error TS(2792): Cannot find module './src/controllers/auth'. Di... Remove this comment to see the full error message
-import authRouter from './src/controllers/auth';
-// @ts-expect-error TS(2792): Cannot find module './src/controllers/categories.j... Remove this comment to see the full error message
-import categoriesRouter from './src/controllers/categories';
+import { errorHandler } from '@/middleware/middleware';
+import { authorize } from '@/middleware/authorization';
 
-// @ts-expect-error TS(1378): Top-level 'await' expressions are only allowed whe... Remove this comment to see the full error message
+import eventRouter from '@/controllers/events';
+import recordRouter from '@/controllers/records';
+import userRouter from '@/controllers/users';
+import authRouter from '@/controllers/auth';
+import categoriesRouter from '@/controllers/categories';
+
 await connectDB();
 
 const app = express();

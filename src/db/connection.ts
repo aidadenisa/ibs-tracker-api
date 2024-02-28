@@ -1,16 +1,12 @@
-// @ts-expect-error TS(2792): Cannot find module 'mongoose'. Did you mean to set... Remove this comment to see the full error message
 import mongoose from 'mongoose';
-import { seedDB } from './seeds';
-import { MONGODB_URI } from '../utils/config';
-import logger from '../utils/logger';
+import { seedDB } from '@/db/seeds';
+import { MONGODB_URI } from '@/utils/config';
+import logger from '@/utils/logger';
 
 const connectDB = async () => {
   mongoose.set('strictQuery', false);
   try {
-    await mongoose.connect(MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    })
+    await mongoose.connect(MONGODB_URI)
     console.log('connected to MongoDB');
 
     //Populate DB with seeds

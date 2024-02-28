@@ -2,12 +2,28 @@
   "compilerOptions": {
     "outDir": "./built",
     "allowJs": true,
-    "target": "es6",
+    "target": "ESNext",
     "types": [
-      "node"
-    ]
+      "node",
+      "jest",
+    ],
+    "module": "NodeNext",
+    "baseUrl": ".",
+    "moduleResolution": "NodeNext",
+    "esModuleInterop": true, /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */
+    "allowSyntheticDefaultImports": true, /* Allow default imports from modules with no default export. This does not affect code emit, just typechecking. */
+    "paths": {
+      "@/*": [
+        "./src/*.ts"
+      ],
+    },
   },
   "include": [
-    "./src/**/*"
-  ]
+    "./src/**/*",
+  ],
+  "exclude": [
+    "node_modules",
+    "built",
+    "logs"
+  ],
 }
