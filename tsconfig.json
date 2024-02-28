@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "./built",
+    "outDir": "./dist",
     "allowJs": true,
     "target": "ESNext",
     "types": [
@@ -8,13 +8,14 @@
       "jest",
     ],
     "module": "NodeNext",
-    "baseUrl": ".",
+    "baseUrl": "./src",
+    "rootDir": "./src",
     "moduleResolution": "NodeNext",
-    "esModuleInterop": true, /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */
+    // "esModuleInterop": true, /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */
     "allowSyntheticDefaultImports": true, /* Allow default imports from modules with no default export. This does not affect code emit, just typechecking. */
     "paths": {
       "@/*": [
-        "./src/*.ts"
+        "./*.ts",
       ],
     },
   },
@@ -26,4 +27,13 @@
     "built",
     "logs"
   ],
+  "ts-node": {
+    // Do not forget to `npm i -D tsconfig-paths`
+    "require": [
+      "tsconfig-paths/register"
+    ],
+  },
+  "tsc-alias": {
+    "resolveFullPaths": true
+  }
 }

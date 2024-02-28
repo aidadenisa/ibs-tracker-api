@@ -1,7 +1,7 @@
 import * as  crypto from 'crypto';
 import * as bcrypt from 'bcrypt';
 
-import emailService from './email';
+import emailService from '@/services/email';
 
 const numbers = '0123456789';
 const charsLower = 'abcdefghijklmnopqrstuvwxyz';
