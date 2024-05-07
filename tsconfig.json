@@ -2,36 +2,34 @@
   "compilerOptions": {
     "outDir": "./dist",
     "allowJs": true,
-    "target": "ESNext",
-    "types": [
-      "node",
-      "jest",
-    ],
+    "target": "ES2022",
+    "types": ["node", "jest"],
     "module": "NodeNext",
     "baseUrl": "./src",
     "rootDir": "./src",
     "moduleResolution": "NodeNext",
     // "esModuleInterop": true, /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */
-    "allowSyntheticDefaultImports": true, /* Allow default imports from modules with no default export. This does not affect code emit, just typechecking. */
+    "allowSyntheticDefaultImports": true /* Allow default imports from modules with no default export. This does not affect code emit, just typechecking. */,
+
+    // TODO: check the following
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "moduleDetection": "force",
+    "isolatedModules": true,
+    // "verbatimModuleSyntax": true,
+    "sourceMap": true,
+    "lib": ["es2022"],
+
     "paths": {
-      "@/*": [
-        "./*.ts",
-      ],
-    },
+      "@/*": ["./*.ts"]
+    }
   },
-  "include": [
-    "./src/**/*",
-  ],
-  "exclude": [
-    "node_modules",
-    "built",
-    "logs"
-  ],
+  "include": ["./src/**/*"],
+  "exclude": ["node_modules", "built", "logs"],
   "ts-node": {
     // Do not forget to `npm i -D tsconfig-paths`
-    "require": [
-      "tsconfig-paths/register"
-    ],
+    "require": ["tsconfig-paths/register"]
   },
   "tsc-alias": {
     "resolveFullPaths": true

@@ -1,59 +1,38 @@
-import sib from '@getbrevo/brevo';
-import { NODE_ENV, BREVO_API_KEY } from '@/utils/config';
-import logger from '@/utils/logger';
+import {
+  TransactionalEmailsApi,
+  TransactionalEmailsApiApiKeys,
+} from '@getbrevo/brevo'
+import { BREVO_API_KEY } from '@/utils/config'
 
-const emailAPI = new sib.TransactionalEmailsApi();
-emailAPI.setApiKey(sib.TransactionalEmailsApiApiKeys.apiKey, BREVO_API_KEY);
-
-const EMAIL_PROVIDER__BREVO = 'BREVO';
-
-const sendEmail = async (provider, params) => {
-  if (provider === EMAIL_PROVIDER__BREVO) {
-    await emailAPI.sendTransacEmail(params)
+type EmailContent = {
+  subject: string
+  sender: {
+    email: string
+    name: string
+  }
+  replyTo: {
+    email: string
+    name: string
+  }
+  to: Array<{ name: string; email: string }>
+  htmlContent: string
+  params: {
+    otp: string
+    timeToExpire: number
   }
 }
 
-const sendOTPEmail = async (recipient, otp, timeToExpire) => {
+interface EmailService {
+  sendEmail(params: EmailContent): void
+}
 
-  // shortcircuit the email for now, console.log OTP for local development
-  if (NODE_ENV === 'dev' || NODE_ENV === 'test') {
-    console.log('otp: ', otp);
-    return;
-  }
+const emailAPI = new TransactionalEmailsApi()
+emailAPI.setApiKey(TransactionalEmailsApiApiKeys.apiKey, BREVO_API_KEY)
 
-  try {
-    // TODO: refactor this nicer using design patterns
-    await sendEmail(EMAIL_PROVIDER__BREVO,
-      {
-        'subject': 'Track IBS - Login using OTP',
-        'sender': { 'email': 'no-reply@notifications.trackibs.com', 'name': 'Noreply Track IBS' },
-        'replyTo': { 'email': 'no-reply@notifications.trackibs.com', 'name': 'Noreply Track IBS' },
-        'to': [{ 'name': recipient.firstName, 'email': recipient.email }],
-        'htmlContent': `<html><body>
-          <h1>Login using OTP</h1>
-          <p>
-            Please use this code to login into Track IBS: <strong>{{params.otp}}</strong> 
-            <br/>
-            This code expires in <strong>{{params.timeToExpire}}</strong> minutes.
-            This code is confidential, do NOT share it with anybody.
-          <p>
-
-          <p>All the best, <br/> The Track IBS Team.</p>
-          
-          </body></html>`,
-        'params': {
-          'otp': otp,
-          'timeToExpire': timeToExpire
-        }
-      }
-    )
-
-  } catch (error) {
-    logger.error(error);
-  }
-
+const sendEmail = async (params: EmailContent) => {
+  emailAPI.sendTransacEmail(params)
 }
 
 export default {
-  sendOTPEmail,
-}
+  sendEmail,
+} as EmailService

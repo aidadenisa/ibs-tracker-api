@@ -10,7 +10,8 @@
     "build:watch": "esbuild src/index.ts --bundle --platform=node --outdir=dist --format=esm --packages=external --watch",
     "start": "NODE_ENV=production npm run clean && npm run build && node dist/index.js",
     "dev": "NODE_ENV=dev concurrently --kill-others \"yarn build:watch\" \"nodemon dist/index.js\"",
-    "test": "NODE_ENV=test node --experimental-vm-modules $(yarn bin jest) --verbose --runInBand --forceExit",
+    "test": "NODE_ENV=test node --experimental-vm-modules $(yarn bin jest) --verbose --runInBand",
+    "api:test": "sh ./src/tests/setup/setupTestDB.sh && yarn test ; sh ./src/tests/setup/cleanupTestDB.sh",
     "lint": "eslint .",
     "start:test": "NODE_ENV=test ts-node src/main.ts",
     "clean": "rm -rf dist"
@@ -26,7 +27,7 @@
   },
   "homepage": "https://github.com/aidadenisa/ibs-tracker-api#readme",
   "dependencies": {
-    "@getbrevo/brevo": "^2.0.0-beta.4",
+    "@getbrevo/brevo": "^2.1.1",
     "bcrypt": "^5.1.0",
     "cors": "^2.8.5",
     "date-fns": "^2.30.0",
@@ -71,7 +72,11 @@
     },
     "transformIgnorePatterns": [
       "./node_modules/"
-    ]
+    ],
+    "rootDir": ".",
+    "moduleNameMapper": {
+      "@/(.*)": "<rootDir>/src/$1"
+    }
   },
   "engines": {
     "node": ">=12.0.0"
