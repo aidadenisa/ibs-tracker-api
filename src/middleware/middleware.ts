@@ -10,11 +10,9 @@ const errorHandler = (error, request, response, next) => {
   }
 
   if (error.message && error.message.match(/expected `email` to be unique/)) {
-    return response
-      .status(400)
-      .send({
-        error: 'The email address is already in use. Please use another one.',
-      })
+    return response.status(400).send({
+      error: 'The email address is already in use. Please use another one.',
+    })
   }
 
   if (error.stack && error.stack.match(/ValidationError/)) {

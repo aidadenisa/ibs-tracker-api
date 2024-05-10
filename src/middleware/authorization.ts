@@ -1,28 +1,26 @@
-import * as jwt from 'jsonwebtoken';
-import { SECRET } from '@/utils/config';
-import User from '@/models/user';
+import jwt from 'jsonwebtoken'
+import { SECRET } from '@/utils/config'
+import User from '@/models/user'
 
 const authorize = async (req, res, next) => {
-  const bearerToken = req.headers.authorization;
-  const token = bearerToken ? bearerToken.split(' ')[1] : '';
+  const bearerToken = req.headers.authorization
+  const token = bearerToken ? bearerToken.split(' ')[1] : ''
   if (!token || !token.length) {
-    return res.status(401).json({ error: 'Missing Authorization Token.' });
+    return res.status(401).json({ error: 'Missing Authorization Token.' })
   }
 
   try {
-    const decoded = jwt.verify(token, SECRET);
+    const decoded = jwt.verify(token, SECRET)
 
-    const user = await User.findById(decoded["userId"]);
+    const user = await User.findById(decoded['userId'])
     if (!user) {
-      return res.status(404).send({ error: 'User not found.' });
+      return res.status(404).send({ error: 'User not found.' })
     }
-    req.user = user;
-    next();
-
-  } catch (err) { next(err) }
+    req.user = user
+    next()
+  } catch (err) {
+    next(err)
+  }
 }
 
-export {
-  authorize,
-}
-
+export { authorize }
