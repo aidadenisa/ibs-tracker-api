@@ -1,13 +1,13 @@
 import cors from 'cors'
 import express from 'express'
-import { errorHandler } from '@/middleware/middleware'
-import { authorize } from '@/middleware/authorization'
+import { errorHandler } from '@/infra/middleware/middleware'
+import { authorize } from '@/modules/users/controllers/middleware/authorization'
 
-import eventRouter from '@/controllers/events'
-import recordRouter from '@/controllers/records'
-import userRouter from '@/controllers/users'
-import authRouter from '@/controllers/auth'
-import categoriesRouter from '@/controllers/categories'
+import eventRouter from '@/modules/events/controllers/events'
+import recordRouter from '@/modules/records/controllers/records'
+import userRouter from '@/modules/users/controllers/users'
+import authRouter from '@/modules/users/controllers/auth'
+import categoriesRouter from '@/modules/events/controllers/categories'
 
 const app = express()
 

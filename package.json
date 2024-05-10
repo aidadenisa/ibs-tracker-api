@@ -9,9 +9,9 @@
     "build": "esbuild src/index.ts --bundle --platform=node --outdir=dist --format=esm --packages=external",
     "build:watch": "esbuild src/index.ts --bundle --platform=node --outdir=dist --format=esm --packages=external --watch",
     "start": "NODE_ENV=production npm run clean && npm run build && node dist/index.js",
-    "dev": "sh ./src/tests/setup/setupTestDB.sh && NODE_ENV=dev concurrently --kill-others \"yarn build:watch\" \"nodemon dist/index.js\" ; sh ./src/tests/setup/cleanupTestDB.sh",
+    "dev": "sh ./src/tests_api/setup/setupTestDB.sh && NODE_ENV=dev concurrently --kill-others \"yarn build:watch\" \"nodemon dist/index.js\" ; sh ./src/tests_api/setup/cleanupTestDB.sh",
     "test": "NODE_ENV=test node --experimental-vm-modules $(yarn bin jest) --verbose --runInBand",
-    "api:test": "sh ./src/tests/setup/setupTestDB.sh && yarn test ; sh ./src/tests/setup/cleanupTestDB.sh",
+    "api:test": "sh ./src/tests_api/setup/setupTestDB.sh && yarn test ; sh ./src/tests_api/setup/cleanupTestDB.sh",
     "lint": "eslint .",
     "start:test": "NODE_ENV=test ts-node src/main.ts",
     "clean": "rm -rf dist"

@@ -1,7 +1,7 @@
 import app from '@/app'
 import logger from '@/utils/logger'
-import { PORT } from '@/utils/config'
-import { connectDB } from '@/db/connection'
+import { PORT } from '@/infra/config/config'
+import { connectDB } from '@/infra/db/connection'
 
 await connectDB()
 
