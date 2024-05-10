@@ -1,7 +1,7 @@
 name: pull-request
 on:
   pull_request:
-    branches: [ main ]
+    branches: [main, dev]
 
 jobs:
   buildAndTest:
@@ -10,12 +10,12 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v3
-      - name: Set up node 
+      - name: Set up node
         uses: actions/setup-node@v3
       - name: Install dependencies
         run: yarn install
-      - name: Run tests 
+      - name: Run tests
         env:
-          TEST_MONGODB_URI: ${{secrets.MONGODB_URI}}
+          TEST_MONGODB_URI: ${{secrets.TEST_MONGODB_URI}}
           SECRET: ${{secrets.SECRET}}
-        run: yarn test
+        run: yarn api:test
