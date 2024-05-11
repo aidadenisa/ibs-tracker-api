@@ -1,7 +1,7 @@
 import Category from '@/modules/events/repo/category'
 
-const getCategories = async (populate) => {
-  if (populate && populate.toLowerCase() === 'true') {
+const getCategories = async (populate: boolean) => {
+  if (populate) {
     return await Category.find({}).populate('events')
   }
   return await Category.find({})

@@ -4,7 +4,7 @@ import { errorHandler } from '@/infra/middleware/middleware'
 import { authorize } from '@/modules/users/controllers/middleware/authorization'
 
 import eventRouter from '@/modules/events/controllers/events'
-import recordRouter from '@/modules/records/controllers/records'
+import recordRouter from '@/modules/records/controllers/handler'
 import userRouter from '@/modules/users/controllers/users'
 import authRouter from '@/modules/users/controllers/auth'
 import categoriesRouter from '@/modules/events/controllers/categories'

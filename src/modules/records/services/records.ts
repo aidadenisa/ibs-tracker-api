@@ -2,6 +2,8 @@ import * as mongoose from 'mongoose'
 import Record from '@/modules/records/repo/record'
 import logger from '@/utils/logger'
 import userService from '@/modules/users/services/users'
+import repo from '@/modules/records/repo/repository'
+import { InternalError } from '@/utils/errors'
 
 const createNewRecord = async (record, user) => {
   const newRecord = new Record({
@@ -17,8 +19,8 @@ const createNewRecord = async (record, user) => {
   return result
 }
 
-const listRecordsByUserId = (userId, populate) => {
-  if (populate && populate.toLowerCase() === 'true') {
+const listRecordsByUserId = (userId: string, populate: boolean = false) => {
+  if (populate) {
     return Record.find({ user: userId }).populate({
       path: 'event',
     })
@@ -47,9 +49,10 @@ const updateRecordProperties = async (recordId, properties) => {
   })
 }
 
-const deleteRecord = async (recordId) => {
-  // TODO: REMOVE RECORD ID FROM THE USER COLLECTION
-  return await Record.findByIdAndDelete(recordId)
+const deleteRecord = async (
+  recordId: string
+): Promise<null | InternalError> => {
+  return repo.deleteRecord(recordId)
 }
 
 const updateRecordsForDate = async (userId, dateInfo, selectedEventsIds) => {

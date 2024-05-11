@@ -5,7 +5,8 @@ const router = express.Router()
 
 router.get('/', async (req, res, next) => {
   try {
-    const result = await categoriesService.getCategories(req.query.populate)
+    const populate = req.query.populate === 'true'
+    const result = await categoriesService.getCategories(populate)
     return res.status(200).json(result)
   } catch (err) {
     next(err)
