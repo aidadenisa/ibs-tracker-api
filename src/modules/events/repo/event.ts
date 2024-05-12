@@ -9,4 +9,4 @@ const EventSchema = new mongoose.Schema({
 prettifyId(EventSchema)
 const Event = mongoose.model('Event', EventSchema)
 
-export default Event
+export { Event }

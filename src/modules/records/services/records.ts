@@ -1,52 +1,53 @@
-import * as mongoose from 'mongoose'
-import Record from '@/modules/records/repo/record'
+import { DayInput } from '@/modules/records/repo/repository'
+import { Record } from '@/modules/records/domain/record'
 import logger from '@/utils/logger'
 import userService from '@/modules/users/services/users'
+import eventService from '@/modules/events/services/events'
 import repo from '@/modules/records/repo/repository'
 import { InternalError } from '@/utils/errors'
+import { Event } from '@/modules/events/domain/event'
 
-const createNewRecord = async (record, user) => {
-  const newRecord = new Record({
-    createdOn: new Date(),
-    user: user.id,
-    event: record.eventId,
+type RecordInput = {
+  eventId: string
+  timezone: string
+  dayYMD: string
+}
+
+const createNewRecord = async (
+  record: RecordInput,
+  userId: string
+): Promise<Record> => {
+  const newRecord = await repo.addRecord({
+    eventId: record.eventId,
+    userId: userId,
     timezone: record.timezone,
-    day: record.dayYMD,
+    dayYMD: record.dayYMD,
   })
-  const result = await newRecord.save()
 
-  await userService.addRecordIdsToUser(result.user, [result._id.toString()])
-  return result
+  await userService.addRecordIdsToUser(newRecord.userId, [newRecord.id])
+  return newRecord
 }
 
-const listRecordsByUserId = (userId: string, populate: boolean = false) => {
+const listRecordsByUserId = async (
+  userId: string,
+  populate: boolean = false
+) => {
+  let records = await repo.listAllRecordsByUserID(userId)
+
   if (populate) {
-    return Record.find({ user: userId }).populate({
-      path: 'event',
-    })
+    const eventIds = records.map((record) => record.event.id)
+    const events: Event[] = await eventService.findEventsByIds(eventIds)
+
+    records = matchEventsToRecords(records, events)
   }
-  return Record.find({ user: userId })
+  return records
 }
 
-const listRecordsForDate = async (userId, dayYMD) => {
-  const result = await Record.find({
-    user: userId,
-    day: {
-      $eq: dayYMD,
-    },
-  })
-  return result
-}
-
-const updateRecordProperties = async (recordId, properties) => {
-  // Add properties we allow update of. For now it's just the event.
-  const updatedProperties = {
-    event: properties.eventId,
-  }
-  // new: true -> Helps in returning the updated object as result
-  return await Record.findByIdAndUpdate(recordId, updatedProperties, {
-    new: true,
-  })
+const listRecordsForDate = async (
+  userId: string,
+  dayYMD: string
+): Promise<Record[]> => {
+  return await repo.listRecordsForDateAndUserId(userId, dayYMD)
 }
 
 const deleteRecord = async (
@@ -55,37 +56,35 @@ const deleteRecord = async (
   return repo.deleteRecord(recordId)
 }
 
-const updateRecordsForDate = async (userId, dateInfo, selectedEventsIds) => {
-  let results
-  const _userId = userId
-
-  // TODO: MAKE THIS A TRANSACTION
-  await Record.deleteMany({
-    user: _userId,
-    day: {
-      $eq: dateInfo.dayYMD,
-    },
-  })
-
-  results = await Record.insertMany(
-    selectedEventsIds.map((eventId) => ({
-      day: dateInfo.dayYMD,
-      timezone: dateInfo.timezone,
-      createdOn: new Date(),
-      event: eventId,
-      user: userId,
-    })),
-    { ordered: true }
-  )
+const updateRecordsForDate = async (
+  userId: string,
+  dayInput: DayInput,
+  updatedEventsIds: string[]
+) => {
+  await repo.updateRecordsForDate(userId, dayInput, updatedEventsIds)
   await userService.updateUserRecordIds(userId)
+}
 
-  return results
+const matchEventsToRecords = (records: Record[], events: Event[]) => {
+  return records.map((record) => {
+    const matchingEvent = events.find((event) => event.id === record.event.id)
+    if (!matchingEvent) return
+
+    return {
+      ...record,
+      event: {
+        id: record.event.id,
+        name: matchingEvent.name,
+        categoryCode: matchingEvent.categoryCode,
+        code: matchingEvent.code,
+      },
+    }
+  })
 }
 
 export default {
   createNewRecord,
   listRecordsByUserId,
-  updateRecordProperties,
   deleteRecord,
   listRecordsForDate,
   updateRecordsForDate,

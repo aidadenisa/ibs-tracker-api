@@ -13,7 +13,7 @@ const postRecordsController = async (
       .json({ error: 'Missing required properties: eventId' })
   }
   try {
-    const result = await recordsService.createNewRecord(data, req.user)
+    const result = await recordsService.createNewRecord(data, req.user.id)
     res.json(result)
   } catch (err) {
     next(err)

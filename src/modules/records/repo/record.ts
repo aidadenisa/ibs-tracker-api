@@ -11,4 +11,4 @@ const RecordSchema = new mongoose.Schema({
 prettifyId(RecordSchema)
 const Record = mongoose.model('Record', RecordSchema)
 
-export default Record
+export { Record }
