@@ -8,22 +8,14 @@ type GetRecordsRequest = {
   populate: boolean
 }
 
-const getRecordsController = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const getRecordsController = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { data, error }: ValidationResult<GetRecordsRequest> =
-      validateRequest(req)
+    const { data, error }: ValidationResult<GetRecordsRequest> = validateRequest(req)
     if (error) {
       return res.status(400).send(`Invalid request data: ${error.message}`)
     }
 
-    const result = await recordsService.listRecordsByUserId(
-      data.userId,
-      data.populate
-    )
+    const result = await recordsService.listRecordsByUserId(data.userId, data.populate)
     return res.json(result)
   } catch (err) {
     next(err)
@@ -35,9 +27,7 @@ const validateRequest = (req: Request): ValidationResult<GetRecordsRequest> => {
     return { data: null, error: { message: 'user id is missing' } }
   }
 
-  const populate = req.query['populate']
-    ? (req.query['populate'] as string).toLowerCase()
-    : ''
+  const populate = req.query['populate'] ? (req.query['populate'] as string).toLowerCase() : ''
   if (populate && populate !== 'true' && populate !== 'false') {
     return { data: null, error: { message: 'populate is invalid' } }
   }

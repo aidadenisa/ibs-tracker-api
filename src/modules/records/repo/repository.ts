@@ -2,6 +2,7 @@ import { InternalError } from '@/utils/errors'
 import { Record as RepoRecord } from '@/modules/records/repo/record'
 import { Record } from '@/modules/records/domain/record'
 import { Result } from '@/utils/utils'
+import mongoose from 'mongoose'
 
 type RecordInput = {
   userId: string
@@ -48,9 +49,7 @@ const addRecord = async (input: RecordInput): Promise<Result<Record>> => {
   }
 }
 
-const listAllRecordsByUserID = async (
-  userId: string
-): Promise<Result<Record[]>> => {
+const listAllRecordsByUserID = async (userId: string): Promise<Result<Record[]>> => {
   try {
     const queryResult = await RepoRecord.find({ user: userId })
 
@@ -76,10 +75,7 @@ const listAllRecordsByUserID = async (
   }
 }
 
-const listRecordsForDateAndUserId = async (
-  userId: string,
-  dayYMD: string
-): Promise<Result<Record[]>> => {
+const listRecordsForDateAndUserId = async (userId: string, dayYMD: string): Promise<Result<Record[]>> => {
   try {
     const queryResults = await RepoRecord.find({
       user: userId,
@@ -110,34 +106,41 @@ const listRecordsForDateAndUserId = async (
   }
 }
 
-const updateRecordsForDate = async (
-  userId: string,
-  dayInput: DayInput,
-  updatedEventsIds: string[]
-): Promise<void> => {
-  // TODO: MAKE THIS A TRANSACTION
+const updateRecordsForDate = async (userId: string, dayInput: DayInput, updatedEventsIds: string[]): Promise<null | InternalError> => {
+  const session = await mongoose.startSession()
 
-  await RepoRecord.deleteMany({
-    user: userId,
-    day: {
-      $eq: dayInput.dayYMD,
-    },
-  })
-
-  await RepoRecord.insertMany(
-    updatedEventsIds.map((eventId) => ({
-      day: dayInput.dayYMD,
-      timezone: dayInput.timezone,
-      createdOn: new Date(),
-      event: eventId,
+  session.startTransaction()
+  try {
+    await RepoRecord.deleteMany({
       user: userId,
-    }))
-  )
+      day: {
+        $eq: dayInput.dayYMD,
+      },
+    }).session(session)
+
+    await RepoRecord.insertMany(
+      updatedEventsIds.map((eventId) => ({
+        day: dayInput.dayYMD,
+        timezone: dayInput.timezone,
+        createdOn: new Date(),
+        event: eventId,
+        user: userId,
+      })),
+      { session: session }
+    )
+    session.commitTransaction()
+    session.endSession()
+    return null
+  } catch (err) {
+    session.abortTransaction()
+    session.endSession()
+    return {
+      message: `error while executing update records transaction for user id ${userId}: ${err.message}`,
+    } as InternalError
+  }
 }
 
-const deleteRecord = async (
-  recordId: string
-): Promise<null | InternalError> => {
+const deleteRecord = async (recordId: string): Promise<null | InternalError> => {
   // TODO: REMOVE RECORD ID FROM THE USER COLLECTION
   try {
     await RepoRecord.findByIdAndDelete(recordId)

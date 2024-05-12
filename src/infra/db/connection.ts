@@ -5,6 +5,10 @@ import logger from '@/utils/logger'
 
 const connectDB = async () => {
   mongoose.set('strictQuery', false)
+
+  // TODO: Using custom connection
+  // const db = await mongoose.createConnection(MONGODB_URI).asPromise();
+
   try {
     await mongoose.connect(MONGODB_URI)
     console.log('connected to MongoDB')

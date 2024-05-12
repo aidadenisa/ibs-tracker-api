@@ -14,10 +14,7 @@ type RecordInput = {
   dayYMD: string
 }
 
-const createNewRecord = async (
-  record: RecordInput,
-  userId: string
-): Promise<Result<Record>> => {
+const createNewRecord = async (record: RecordInput, userId: string): Promise<Result<Record>> => {
   const { data, error } = await repo.addRecord({
     eventId: record.eventId,
     userId: userId,
@@ -33,10 +30,7 @@ const createNewRecord = async (
   return { data, error: null }
 }
 
-const listRecordsByUserId = async (
-  userId: string,
-  populate: boolean = false
-): Promise<Result<Record[]>> => {
+const listRecordsByUserId = async (userId: string, populate: boolean = false): Promise<Result<Record[]>> => {
   const { data, error } = await repo.listAllRecordsByUserID(userId)
   if (error) {
     return { data, error }
@@ -51,10 +45,7 @@ const listRecordsByUserId = async (
   return { data, error: null }
 }
 
-const listRecordsForDate = async (
-  userId: string,
-  dayYMD: string
-): Promise<Result<Record[]>> => {
+const listRecordsForDate = async (userId: string, dayYMD: string): Promise<Result<Record[]>> => {
   const { data, error } = await repo.listRecordsForDateAndUserId(userId, dayYMD)
   if (error) {
     return { data: null, error }
@@ -63,18 +54,17 @@ const listRecordsForDate = async (
   return { data, error: null }
 }
 
-const deleteRecord = async (
-  recordId: string
-): Promise<null | InternalError> => {
+const deleteRecord = async (recordId: string): Promise<null | InternalError> => {
   return repo.deleteRecord(recordId)
 }
 
-const updateRecordsForDate = async (
-  userId: string,
-  dayInput: DayInput,
-  updatedEventsIds: string[]
-) => {
-  await repo.updateRecordsForDate(userId, dayInput, updatedEventsIds)
+const updateRecordsForDate = async (userId: string, dayInput: DayInput, updatedEventsIds: string[]): Promise<null | InternalError> => {
+  const err = await repo.updateRecordsForDate(userId, dayInput, updatedEventsIds)
+  if (err) {
+    return err
+  }
+
+  // TODO: make this return error
   await userService.updateUserRecordIds(userId)
 }
 

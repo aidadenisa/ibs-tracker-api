@@ -1,5 +1,5 @@
 import Category from '@/modules/events/repo/category'
-import Event from '@/modules/events/repo/event'
+import { Event } from '@/modules/events/repo/event'
 import logger from '@/utils/logger'
 
 const categoriesEventsMap = new Map(
