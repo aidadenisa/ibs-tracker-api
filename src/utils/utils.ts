@@ -1,3 +1,5 @@
+import { InternalError } from '@/utils/errors'
+
 const parseBoolean = (value: string) => {
   switch (value) {
     case 'true':
@@ -8,4 +10,10 @@ const parseBoolean = (value: string) => {
   }
 }
 
+type Result<T> = {
+  data: T
+  error: InternalError
+}
+
 export { parseBoolean }
+export type { Result }

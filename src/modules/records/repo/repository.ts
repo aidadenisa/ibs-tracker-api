@@ -1,6 +1,7 @@
 import { InternalError } from '@/utils/errors'
 import { Record as RepoRecord } from '@/modules/records/repo/record'
 import { Record } from '@/modules/records/domain/record'
+import { Result } from '@/utils/utils'
 
 type RecordInput = {
   userId: string
@@ -14,7 +15,7 @@ type DayInput = {
   timezone: string
 }
 
-const addRecord = async (input: RecordInput): Promise<Record> => {
+const addRecord = async (input: RecordInput): Promise<Result<Record>> => {
   const newRecord = new RepoRecord({
     createdOn: new Date(),
     user: input.userId,
@@ -22,52 +23,91 @@ const addRecord = async (input: RecordInput): Promise<Record> => {
     timezone: input.timezone,
     day: input.dayYMD,
   })
-  const result = await newRecord.save()
+  try {
+    const result = await newRecord.save()
 
-  return {
-    id: result.id,
-    userId: result.user.toString(),
-    timezone: result.timezone,
-    day: result.day,
-    event: {
-      id: result.event.toString(),
-    },
-  } as Record
+    return {
+      data: {
+        id: result.id,
+        userId: result.user.toString(),
+        timezone: result.timezone,
+        day: result.day,
+        event: {
+          id: result.event.toString(),
+        },
+      } as Record,
+      error: null,
+    }
+  } catch (err) {
+    return {
+      data: null,
+      error: {
+        message: `error while adding the record for user id ${input.userId}: ${err.message}`,
+      } as InternalError,
+    }
+  }
 }
 
-const listAllRecordsByUserID = async (userId: string): Promise<Record[]> => {
-  const queryResult = await RepoRecord.find({ user: userId })
-  return queryResult.map((record) => ({
-    id: record.id,
-    userId: record.user.toString(),
-    day: record.day,
-    timezone: record.timezone,
-    event: {
-      id: record.event.toString(),
-    },
-  })) as Record[]
+const listAllRecordsByUserID = async (
+  userId: string
+): Promise<Result<Record[]>> => {
+  try {
+    const queryResult = await RepoRecord.find({ user: userId })
+
+    return {
+      data: queryResult.map((record) => ({
+        id: record.id,
+        userId: record.user.toString(),
+        day: record.day,
+        timezone: record.timezone,
+        event: {
+          id: record.event.toString(),
+        },
+      })) as Record[],
+      error: null,
+    }
+  } catch (err) {
+    return {
+      data: null,
+      error: {
+        message: `error while getting all records for user id ${userId}: ${err.message}`,
+      } as InternalError,
+    }
+  }
 }
 
 const listRecordsForDateAndUserId = async (
   userId: string,
   dayYMD: string
-): Promise<Record[]> => {
-  const queryResults = await RepoRecord.find({
-    user: userId,
-    day: {
-      $eq: dayYMD,
-    },
-  })
+): Promise<Result<Record[]>> => {
+  try {
+    const queryResults = await RepoRecord.find({
+      user: userId,
+      day: {
+        $eq: dayYMD,
+      },
+    })
 
-  return queryResults.map((result) => ({
-    id: result.id,
-    userId: result.user.toString(),
-    timezone: result.timezone,
-    day: result.day,
-    event: {
-      id: result.event.toString(),
-    },
-  })) as Record[]
+    return {
+      data: queryResults.map((result) => ({
+        id: result.id,
+        userId: result.user.toString(),
+        timezone: result.timezone,
+        day: result.day,
+        event: {
+          id: result.event.toString(),
+        },
+      })) as Record[],
+      error: null,
+    }
+  } catch (err) {
+    return {
+      data: null,
+      error: {
+        message: `error while querying records by date for user id ${userId}: ${err}`,
+      },
+    }
+  }
 }
 
 const updateRecordsForDate = async (

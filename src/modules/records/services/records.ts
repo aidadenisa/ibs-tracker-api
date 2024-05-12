@@ -6,6 +6,7 @@ import eventService from '@/modules/events/services/events'
 import repo from '@/modules/records/repo/repository'
 import { InternalError } from '@/utils/errors'
 import { Event } from '@/modules/events/domain/event'
+import { Result } from '@/utils/utils'
 
 type RecordInput = {
   eventId: string
@@ -16,38 +17,50 @@ type RecordInput = {
 const createNewRecord = async (
   record: RecordInput,
   userId: string
-): Promise<Record> => {
-  const newRecord = await repo.addRecord({
+): Promise<Result<Record>> => {
+  const { data, error } = await repo.addRecord({
     eventId: record.eventId,
     userId: userId,
     timezone: record.timezone,
     dayYMD: record.dayYMD,
   })
-
-  await userService.addRecordIdsToUser(newRecord.userId, [newRecord.id])
-  return newRecord
+  if (error) {
+    return { data: null, error: error }
+  }
+  if (data) {
+    await userService.addRecordIdsToUser(data.userId, [data.id])
+  }
+  return { data, error: null }
 }
 
 const listRecordsByUserId = async (
   userId: string,
   populate: boolean = false
-) => {
-  let records = await repo.listAllRecordsByUserID(userId)
+): Promise<Result<Record[]>> => {
+  const { data, error } = await repo.listAllRecordsByUserID(userId)
+  if (error) {
+    return { data, error }
+  }
 
-  if (populate) {
-    const eventIds = records.map((record) => record.event.id)
+  if (data && populate) {
+    const eventIds = data.map((record) => record.event.id)
     const events: Event[] = await eventService.findEventsByIds(eventIds)
 
-    records = matchEventsToRecords(records, events)
+    return { data: matchEventsToRecords(data, events), error: null }
   }
-  return records
+  return { data, error: null }
 }
 
 const listRecordsForDate = async (
   userId: string,
   dayYMD: string
-): Promise<Record[]> => {
-  return await repo.listRecordsForDateAndUserId(userId, dayYMD)
+): Promise<Result<Record[]>> => {
+  const { data, error } = await repo.listRecordsForDateAndUserId(userId, dayYMD)
+  if (error) {
+    return { data: null, error }
+  }
+
+  return { data, error: null }
 }
 
 const deleteRecord = async (
