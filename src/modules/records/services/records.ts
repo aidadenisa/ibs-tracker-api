@@ -22,7 +22,7 @@ const createNewRecord = async (record: RecordInput, userId: string): Promise<Res
     dayYMD: record.dayYMD,
   })
   if (error) {
-    return { data: null, error: error }
+    return { data: null, error }
   }
   if (data) {
     await userService.addRecordIdsToUser(data.userId, [data.id])
@@ -33,12 +33,15 @@ const createNewRecord = async (record: RecordInput, userId: string): Promise<Res
 const listRecordsByUserId = async (userId: string, populate: boolean = false): Promise<Result<Record[]>> => {
   const { data, error } = await repo.listAllRecordsByUserID(userId)
   if (error) {
-    return { data, error }
+    return { data: null, error }
   }
 
   if (data && populate) {
     const eventIds = data.map((record) => record.event.id)
-    const events: Event[] = await eventService.findEventsByIds(eventIds)
+    const { data: events, error: err } = await eventService.findEventsByIds(eventIds)
+    if (err) {
+      return { data: null, error: err }
+    }
 
     return { data: matchEventsToRecords(data, events), error: null }
   }

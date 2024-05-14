@@ -2,6 +2,8 @@ import logger from '@/utils/logger'
 
 // Middleware that manages error handling in one place
 // This is an Express error handler, that has 4 params
+
+// TODO: put these in the auth module
 const errorHandler = (error, request, response, next) => {
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'Malformed id' })
@@ -14,9 +16,7 @@ const errorHandler = (error, request, response, next) => {
   }
 
   if (error.stack && error.stack.match(/ValidationError/)) {
-    return response
-      .status(400)
-      .send({ error: 'The data you send is not valid.' })
+    return response.status(400).send({ error: 'The data you send is not valid.' })
   }
 
   if (error.message && error.message.match(/User not found/)) {
@@ -36,9 +36,7 @@ const errorHandler = (error, request, response, next) => {
   }
 
   if (error.name === 'JsonWebTokenError') {
-    return response
-      .status(401)
-      .json({ error: 'Invalid or missing JWT. Please log in again.' })
+    return response.status(401).json({ error: 'Invalid or missing JWT. Please log in again.' })
   }
 
   if (error) {

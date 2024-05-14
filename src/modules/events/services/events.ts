@@ -1,14 +1,14 @@
 import { Event } from '@/modules/events/domain/event'
 import { Event as EventRepo } from '@/modules/events/repo/event'
 import repo from '@/modules/events/repo/repository'
+import { Result } from '@/utils/utils'
 
-// TODO: move in repo
-const listEvents = async () => {
-  return await EventRepo.find({})
+const listEvents = async (): Promise<Result<Event[]>> => {
+  return await repo.listEvents()
 }
 
-const findEventsByIds = async (eventIds: string[]): Promise<Event[]> => {
-  return repo.findEventsByIds(eventIds)
+const findEventsByIds = async (eventIds: string[]): Promise<Result<Event[]>> => {
+  return await repo.findEventsByIds(eventIds)
 }
 
 export default {

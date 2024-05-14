@@ -14,4 +14,4 @@ const CategorySchema = new mongoose.Schema({
 prettifyId(CategorySchema)
 const Category = mongoose.model('Category', CategorySchema)
 
-export default Category
+export { Category }

@@ -1,4 +1,4 @@
-import Category from '@/modules/events/repo/category'
+import { Category } from '@/modules/events/repo/category'
 import { Event } from '@/modules/events/repo/event'
 import logger from '@/utils/logger'
 
@@ -130,9 +130,7 @@ const seedCategory = async (categoryName) => {
   const existingCategory = await Category.findOne({
     code: categoryName.toUpperCase(),
   })
-  const eventsIds = (
-    await Event.find({ category_code: categoryName.toUpperCase() })
-  ).map((e) => e._id)
+  const eventsIds = (await Event.find({ category_code: categoryName.toUpperCase() })).map((e) => e._id)
   if (!existingCategory) {
     return await new Category({
       name: categoryName,
