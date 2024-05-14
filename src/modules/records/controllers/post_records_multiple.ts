@@ -1,4 +1,5 @@
 import recordsService from '@/modules/records/services/records'
+import { API_SERVER_ERROR } from '@/utils/errors'
 import { NextFunction, Request, Response } from 'express'
 
 const postRecordsMultipleController = async (req: Request, res: Response, next: NextFunction) => {
@@ -7,12 +8,13 @@ const postRecordsMultipleController = async (req: Request, res: Response, next: 
       error: 'Missing required properties: dateInfo, dateInfo.dayYMD, dateInfo.timezone or selectedEventsIds',
     })
   }
-  try {
-    const result = await recordsService.updateRecordsForDate(req.user.id, req.body.dateInfo, req.body.selectedEventsIds)
-    return res.json(result)
-  } catch (err) {
-    next(err)
+
+  const err = await recordsService.updateRecordsForDate(req.user.id, req.body.dateInfo, req.body.selectedEventsIds)
+  if (err !== null) {
+    return res.status(API_SERVER_ERROR.statusCode).send(API_SERVER_ERROR.message)
   }
+
+  return res.status(200)
 }
 
 const isValidInput = (input: any): boolean => {

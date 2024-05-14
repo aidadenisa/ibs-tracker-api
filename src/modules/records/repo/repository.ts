@@ -36,7 +36,7 @@ const addRecord = async (input: RecordInput): Promise<Result<Record>> => {
         event: {
           id: result.event.toString(),
         },
-      } as Record,
+      } satisfies Record,
       error: null,
     }
   } catch (err) {
@@ -44,7 +44,7 @@ const addRecord = async (input: RecordInput): Promise<Result<Record>> => {
       data: null,
       error: {
         message: `error while adding the record for user id ${input.userId}: ${err.message}`,
-      } as InternalError,
+      } satisfies InternalError,
     }
   }
 }
@@ -62,7 +62,7 @@ const listAllRecordsByUserID = async (userId: string): Promise<Result<Record[]>>
         event: {
           id: record.event.toString(),
         },
-      })) as Record[],
+      })) satisfies Record[],
       error: null,
     }
   } catch (err) {
@@ -70,7 +70,7 @@ const listAllRecordsByUserID = async (userId: string): Promise<Result<Record[]>>
       data: null,
       error: {
         message: `error while getting all records for user id ${userId}: ${err.message}`,
-      } as InternalError,
+      } satisfies InternalError,
     }
   }
 }
@@ -93,7 +93,7 @@ const listRecordsForDateAndUserId = async (userId: string, dayYMD: string): Prom
         event: {
           id: result.event.toString(),
         },
-      })) as Record[],
+      })) satisfies Record[],
       error: null,
     }
   } catch (err) {
@@ -101,7 +101,7 @@ const listRecordsForDateAndUserId = async (userId: string, dayYMD: string): Prom
       data: null,
       error: {
         message: `error while querying records by date for user id ${userId}: ${err}`,
-      },
+      } satisfies InternalError,
     }
   }
 }
@@ -136,7 +136,7 @@ const updateRecordsForDate = async (userId: string, dayInput: DayInput, updatedE
     session.endSession()
     return {
       message: `error while executing update records transaction for user id ${userId}: ${err.message}`,
-    } as InternalError
+    } satisfies InternalError
   }
 }
 
@@ -147,7 +147,7 @@ const deleteRecord = async (recordId: string): Promise<null | InternalError> => 
   } catch (err) {
     return {
       message: `error while deleting record with id ${recordId}: ${err.message}`,
-    } as InternalError
+    } satisfies InternalError
   }
   return null
 }
