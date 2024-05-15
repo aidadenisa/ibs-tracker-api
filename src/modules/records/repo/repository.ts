@@ -109,14 +109,16 @@ const listRecordsForDateAndUserId = async (userId: string, dayYMD: string): Prom
 const updateRecordsForDate = async (userId: string, dayInput: DayInput, updatedEventsIds: string[]): Promise<null | InternalError> => {
   const session = await mongoose.startSession()
 
-  session.startTransaction()
+  // TODO: error on transactions https://stackoverflow.com/questions/51461952/mongodb-v4-0-transaction-mongoerror-transaction-numbers-are-only-allowed-on-a
+  // session.startTransaction()
   try {
     await RepoRecord.deleteMany({
       user: userId,
       day: {
         $eq: dayInput.dayYMD,
       },
-    }).session(session)
+    })
+    // .session(session)
 
     await RepoRecord.insertMany(
       updatedEventsIds.map((eventId) => ({
@@ -125,15 +127,15 @@ const updateRecordsForDate = async (userId: string, dayInput: DayInput, updatedE
         createdOn: new Date(),
         event: eventId,
         user: userId,
-      })),
-      { session: session }
+      }))
+      // { session: session }
     )
-    session.commitTransaction()
-    session.endSession()
+    // session.commitTransaction()
+    // session.endSession()
     return null
   } catch (err) {
-    session.abortTransaction()
-    session.endSession()
+    // session.abortTransaction()
+    // session.endSession()
     return {
       message: `error while executing update records transaction for user id ${userId}: ${err.message}`,
     } satisfies InternalError

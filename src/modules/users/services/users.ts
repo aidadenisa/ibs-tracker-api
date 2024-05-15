@@ -2,6 +2,7 @@ import * as bcrypt from 'bcrypt'
 import User from '@/modules/users/repo/user'
 import recordService from '@/modules/records/services/records'
 import { addMinutes } from 'date-fns'
+import logger from '@/utils/logger'
 
 const LOGIN_WINDOW = 2 // minutes
 
@@ -50,14 +51,15 @@ const addRecordIdsToUser = async (_userId, recordIds) => {
 
 const updateUserRecordIds = async (_userId) => {
   // const records = await Record.find({ user: _userId });
-  const records = await recordService.listRecordsByUserId(
-    _userId.toString(),
-    false
-  )
+  const { data: records, error } = await recordService.listRecordsByUserId(_userId.toString(), false)
+  if (error) {
+    // TODO: return error
+    logger.error(error.message)
+  }
 
   // TODO: MAKE A DICTIONARY AND UPDATE ONLY THE SPECIFIC DATE
   await User.findByIdAndUpdate(_userId, {
-    records: records.map((record) => record._id.toString()),
+    records: records.map((record) => record.id.toString()),
   })
 }
 

@@ -1,7 +1,8 @@
 import supertest from 'supertest'
 import app from '@/app'
 import User from '@/modules/users/repo/user'
-import Record from '@/modules/records/repo/record'
+import { Record } from '@/modules/records/repo/record'
+import { Event } from '@/modules/events/domain/event'
 
 import eventService from '@/modules/events/services/events'
 import recordService from '@/modules/records/services/records'
@@ -28,8 +29,8 @@ const dateInfo = {
 
 describe('Records API', () => {
   describe('GET /records ', () => {
-    let token
-    let selectedEventsIds
+    let token: string
+    let selectedEventsIds: string[]
     const date = new Date()
 
     beforeAll(async () => {
@@ -41,9 +42,10 @@ describe('Records API', () => {
       const { otp } = await testApi.signup(testUser)
       token = (await testApi.validateOTP(testUser.email, otp)).token
 
-      selectedEventsIds = (await eventService.listEvents())
-        .filter((event, index) => index < 4)
-        .map((event) => event.id)
+      const { data, error } = await eventService.listEvents()
+      expect(error).toBeNull()
+
+      selectedEventsIds = data.filter((event, index) => index < 4).map((event) => event.id)
 
       await api
         .post('/records/multiple')
@@ -66,26 +68,20 @@ describe('Records API', () => {
         .then((response) => {
           const records = response.body
           expect(records.length).toBe(selectedEventsIds.length)
-          expect(records.map((record) => record.event)).toStrictEqual(
-            selectedEventsIds
-          )
+          expect(records.map((record) => record.event)).toStrictEqual(selectedEventsIds)
 
-          const lengthOfRecordsOnTheSameDate = records.filter(
-            (record) => record.day === format(date, 'yyyy-MM-dd')
-          )
+          const lengthOfRecordsOnTheSameDate = records.filter((record) => record.day === format(date, 'yyyy-MM-dd'))
 
-          expect(lengthOfRecordsOnTheSameDate.length).toBe(
-            selectedEventsIds.length
-          )
+          expect(lengthOfRecordsOnTheSameDate.length).toBe(selectedEventsIds.length)
         })
     })
     // test('result respects the schema', () => { })
   })
 
   describe('POST /records/multiple', () => {
-    let token
-    let events
-    let userId
+    let token: string
+    let events: Event[]
+    let userId: string
 
     const BASE_URL = '/records/multiple'
 
@@ -98,7 +94,10 @@ describe('Records API', () => {
       userId = id
       token = (await testApi.validateOTP(testUser.email, otp)).token
 
-      events = await eventService.listEvents()
+      const { data, error } = await eventService.listEvents()
+      expect(error).toBeNull()
+
+      events = data
     })
 
     test('if missing required properties in the body, returns error and status 400', async () => {
@@ -136,9 +135,7 @@ describe('Records API', () => {
     })
 
     test('saves records for a specific date', async () => {
-      const selectedEventsIds = events
-        .map((event) => event.id)
-        .filter((event, index) => index % 4 === 0)
+      const selectedEventsIds = events.map((event) => event.id).filter((event, index) => index % 4 === 0)
 
       await api
         .post(BASE_URL)
@@ -149,15 +146,11 @@ describe('Records API', () => {
         })
         .expect(200)
 
-      const records = await recordService.listRecordsForDate(
-        userId,
-        dateInfo.dayYMD
-      )
+      const { data: records, error } = await recordService.listRecordsForDate(userId, dateInfo.dayYMD)
+      expect(error).toBeNull()
       expect(records.length).toBeGreaterThanOrEqual(selectedEventsIds.length)
 
-      const eventsIdsFromRecords = records.map((record) =>
-        record.event.toString()
-      )
+      const eventsIdsFromRecords = records.map((record) => record.event.toString())
 
       for (let i = 0; i < selectedEventsIds.length; i++) {
         expect(eventsIdsFromRecords).toContain(selectedEventsIds[i])
@@ -165,21 +158,11 @@ describe('Records API', () => {
     })
 
     test('overwrites previous records on that date when necessary', async () => {
-      const existingEventsIds = events
-        .map((event) => event.id)
-        .filter((event, index) => index < 4)
-      const selectedEventsIds = events
-        .map((event) => event.id)
-        .filter((event, index) => index % 2 === 0)
-      const idsToBeRemoved = existingEventsIds.filter(
-        (id) => selectedEventsIds.indexOf(id) === -1
-      )
+      const existingEventsIds = events.map((event) => event.id).filter((event, index) => index < 4)
+      const selectedEventsIds = events.map((event) => event.id).filter((event, index) => index % 2 === 0)
+      const idsToBeRemoved = existingEventsIds.filter((id) => selectedEventsIds.indexOf(id) === -1)
 
-      await recordService.updateRecordsForDate(
-        userId,
-        dateInfo,
-        existingEventsIds
-      )
+      await recordService.updateRecordsForDate(userId, dateInfo, existingEventsIds)
 
       await api
         .post(BASE_URL)
@@ -190,10 +173,8 @@ describe('Records API', () => {
         })
         .expect(200)
 
-      const recordsAfterUpdate = await recordService.listRecordsForDate(
-        userId,
-        dateInfo.dayYMD
-      )
+      const { data: recordsAfterUpdate, error } = await recordService.listRecordsForDate(userId, dateInfo.dayYMD)
+      expect(error).toBeNull()
 
       expect(recordsAfterUpdate.length).toBe(selectedEventsIds.length)
       for (let i = 0; i < idsToBeRemoved.length; i++) {
@@ -202,9 +183,7 @@ describe('Records API', () => {
     })
 
     test('saves record ids in the user object', async () => {
-      const selectedEventsIds = events
-        .map((event) => event.id)
-        .filter((event, index) => index % 2 === 0)
+      const selectedEventsIds = events.map((event) => event.id).filter((event, index) => index % 2 === 0)
 
       await api
         .post(BASE_URL)
@@ -217,9 +196,7 @@ describe('Records API', () => {
         .expect(async (result) => {
           const records = result.body
           const userInfo = await userService.getUserById(userId, false)
-          const userInfoRecordsIds = userInfo.records.map((record) =>
-            record.toString()
-          )
+          const userInfoRecordsIds = userInfo.records.map((record) => record.toString())
 
           for (let i = 0; i < records.length; i++) {
             expect(userInfoRecordsIds).toContain(records[i].id)
@@ -228,18 +205,17 @@ describe('Records API', () => {
     })
 
     test('overwrites previous record ids on the user object', async () => {
-      const existingEventsIds = events
-        .map((event) => event.id)
-        .filter((event, index) => index < 4)
-      const selectedEventsIds = events
-        .map((event) => event.id)
-        .filter((event, index) => index % 2 === 0)
+      const existingEventsIds = events.map((event) => event.id).filter((event, index) => index < 4)
+      const selectedEventsIds = events.map((event) => event.id).filter((event, index) => index % 2 === 0)
 
-      const existingRecords = await recordService.updateRecordsForDate(
-        userId,
-        dateInfo,
-        existingEventsIds
-      )
+      const { data: existingRecords, error: err } = await recordService.listRecordsForDate(userId, dateInfo.dayYMD)
+      expect(err).toBeNull()
+      const recordIdsToBeRemoved = existingRecords
+        .filter((record) => selectedEventsIds.indexOf(record.event.toString()) === -1)
+        .map((record) => record.id)
+
+      const error = await recordService.updateRecordsForDate(userId, dateInfo, existingEventsIds)
+      expect(error).toBeNull()
 
       await api
         .post(BASE_URL)
@@ -250,16 +226,10 @@ describe('Records API', () => {
         })
         .expect(200)
 
-      const recordIdsToBeRemoved = existingRecords
-        .filter(
-          (record) => selectedEventsIds.indexOf(record.event.toString()) === -1
-        )
-        .map((record) => record.id)
-
       const userInfo = await userService.getUserById(userId, false)
 
       for (let i = 0; i < recordIdsToBeRemoved.length; i++) {
-        expect(userInfo.records).not.toContain(recordIdsToBeRemoved[i].id)
+        expect(userInfo.records).not.toContain(recordIdsToBeRemoved[i])
       }
     })
   })

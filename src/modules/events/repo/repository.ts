@@ -2,7 +2,7 @@ import { Event as EventRepo } from '@/modules/events/repo/event'
 import { Event } from '@/modules/events/domain/event'
 import { Result } from '@/utils/utils'
 import { InternalError } from '@/utils/errors'
-import { Category as CategoryRepo } from './category.js'
+import { Category as CategoryRepo } from '@/modules/events/repo/category'
 import { Category } from '@/modules/events/domain/category'
 
 const listEvents = async (): Promise<Result<Event[]>> => {
