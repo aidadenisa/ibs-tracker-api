@@ -9,7 +9,7 @@ const postRecordsMultipleController = async (req: Request, res: Response, next: 
     })
   }
 
-  const err = await recordsService.updateRecordsForDate(req.user.id, req.body.dateInfo, req.body.selectedEventsIds)
+  const err = await recordsService.updateRecordsForDate(req.context.userId, req.body.dateInfo, req.body.selectedEventsIds)
   if (err !== null) {
     return res.status(API_SERVER_ERROR.statusCode).json({ error: API_SERVER_ERROR.message })
   }

@@ -8,7 +8,7 @@ const postRecordsController = async (req: Request, res: Response, next: NextFunc
     return res.status(400).json({ error: 'Missing required properties: eventId' })
   }
 
-  const { data, error } = await recordsService.createNewRecord(body, req.user.id)
+  const { data, error } = await recordsService.createNewRecord(body, req.context.userId)
   if (error !== null) {
     res.status(API_SERVER_ERROR.statusCode).json({ error: API_SERVER_ERROR.message })
   }

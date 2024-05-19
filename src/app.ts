@@ -1,6 +1,5 @@
 import cors from 'cors'
 import express from 'express'
-import { errorHandler } from '@/infra/middleware/middleware'
 import { authorize } from '@/modules/users/controllers/middleware/authorization'
 
 import eventRouter from '@/modules/events/controllers/handler'
@@ -26,6 +25,6 @@ app.use('/events', authorize, eventRouter)
 // Handler for requests with unknown endpoint
 // app.use(unknownEndpoint)
 // Handler of requests that have errors
-app.use(errorHandler)
+// app.use(errorHandler)
 
 export default app

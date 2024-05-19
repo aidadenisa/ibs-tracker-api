@@ -2,7 +2,6 @@ import supertest from 'supertest'
 import app from '@/app'
 import { User as UserRecord } from '@/modules/users/repo/user'
 import { Record as RepoRecord } from '@/modules/records/repo/record'
-import { Event } from '@/modules/events/domain/event'
 
 import eventService from '@/modules/events/services/events'
 import recordService from '@/modules/records/services/records'
@@ -12,7 +11,6 @@ import testApi from '@/tests_api/utils/testApi'
 import { format } from 'date-fns'
 import { closeDBConns, connectTestDB } from '@/infra/db/connection'
 import { Record } from '@/modules/records/domain/record'
-import { assert } from 'console'
 
 const api = supertest(app)
 
@@ -143,7 +141,7 @@ describe('Records API', () => {
     for (let i = 0; i < selectedEventsIds.length; i++) {
       expect(eventsIdsFromRecords).toContain(selectedEventsIds[i])
     }
-  }, 100000)
+  })
 
   test('overwrites previous records on that date when necessary', async () => {
     const { data: events, error: err } = await eventService.listEvents()
@@ -237,5 +235,5 @@ describe('Records API', () => {
     await UserRecord.deleteMany({})
     await RepoRecord.deleteMany({})
     await closeDBConns()
-  }, 100000)
+  })
 })

@@ -8,7 +8,11 @@ export {}
 declare global {
   namespace Express {
     export interface Request {
-      user?: User
+      context?: Context
     }
   }
+}
+
+class Context {
+  userId?: string
 }

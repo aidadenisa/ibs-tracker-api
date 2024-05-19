@@ -4,7 +4,7 @@ import { User } from '@/modules/users/domain/user'
 import recordService from '@/modules/records/services/records'
 import { ErrorUnion, Result } from '@/utils/utils'
 import { addMinutes } from 'date-fns'
-import { InternalError, NotFoundError, ValidationError } from '@/utils/errors'
+import { InternalError } from '@/utils/errors'
 
 const LOGIN_WINDOW = 2 // minutes
 export type NewUserInput = {
@@ -20,7 +20,7 @@ type UserAuthData = {
   accessEndDate: Date
 }
 
-const getUserById = async (userId: string, populate: boolean): Promise<Result<User>> => {
+const getUserById = async (userId: string, populate: boolean = false): Promise<Result<User>> => {
   const { data: user, error } = await repo.findUserById(userId)
   if (error) {
     return { data: null, error }

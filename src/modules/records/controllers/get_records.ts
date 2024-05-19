@@ -23,7 +23,7 @@ const getRecordsController = async (req: Request, res: Response, next: NextFunct
 }
 
 const validateRequest = (req: Request): ValidationResult<GetRecordsRequest> => {
-  if (!req.user || !req.user.id) {
+  if (!req.context || !req.context.userId) {
     return { data: null, error: new ValidationError({ message: 'user id is missing' }) }
   }
 
@@ -34,7 +34,7 @@ const validateRequest = (req: Request): ValidationResult<GetRecordsRequest> => {
 
   return {
     data: {
-      userId: req.user.id,
+      userId: req.context.userId,
       populate: parseBoolean(populate),
     },
     error: null,
