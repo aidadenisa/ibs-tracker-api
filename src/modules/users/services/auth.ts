@@ -1,44 +1,45 @@
-import User from '@/modules/users/repo/user'
+import { User as UserRecord } from '@/modules/users/repo/user'
 import jwt from 'jsonwebtoken'
 import { SECRET } from '@/infra/config/config'
-import userService from '@/modules/users/services/users'
+import userService, { NewUserInput } from '@/modules/users/services/users'
 import otpService from '@/modules/users/services/otp'
+import { Result } from '@/utils/utils'
+import { User } from '@/modules/users/domain/user'
+import { InternalError, NotFoundError } from '@/utils/errors'
 
-const login = async (email) => {
-  const user = await User.findOne({ email })
-  if (!user) throw new Error('User not found.')
+const login = async (email: string): Promise<NotFoundError | InternalError> => {
+  const { data: user, error } = await userService.getUserByEmail(email)
+  if (error) {
+    return error
+  }
+  if (!user) {
+    return { message: `User not found.` } satisfies NotFoundError
+  }
 
   const otp = await refreshUserOTP(user)
 
-  otpService.sendOTP(
-    { firstName: user.firstName, email: user.email },
-    otp,
-    userService.LOGIN_WINDOW
-  )
+  otpService.sendOTP({ firstName: user.firstName, email: user.email }, otp, userService.LOGIN_WINDOW)
 
   return
 }
 
-const signup = async (data) => {
-  data.pass = otpService.generateSecret()
-  const userData = await userService.createNewUser(data)
-  otpService.sendOTP(
-    { firstName: userData.firstName, email: userData.email },
-    data.pass,
-    userService.LOGIN_WINDOW
-  )
-  return userData
+const signup = async (input: NewUserInput): Promise<Result<User>> => {
+  const otp = otpService.generateSecret()
+  const { data: user, error } = await userService.createNewUser(input, otp)
+  if (error) {
+    return { data: null, error }
+  }
+  if (user && user.email) {
+    otpService.sendOTP({ firstName: user.firstName, email: user.email }, otp, userService.LOGIN_WINDOW)
+  }
+  return { data: user, error: null }
 }
 
 const validateOTP = async (email, inputOTP) => {
-  const user = await User.findOne({ email })
+  const user = await UserRecord.findOne({ email })
   if (!user) throw new Error('User not found.')
 
-  const isValid = await otpService.verifyOTP(
-    inputOTP,
-    user.hash,
-    user.accessEndDate
-  )
+  const isValid = await otpService.verifyOTP(inputOTP, user.hash, user.accessEndDate)
 
   if (!isValid) {
     throw new Error('Invalid OTP.')
@@ -55,9 +56,9 @@ const validateOTP = async (email, inputOTP) => {
   return { token }
 }
 
-const refreshUserOTP = async (user) => {
+const refreshUserOTP = async (user: User) => {
   const otp = otpService.generateSecret()
-  await userService.updateUserOTP(user._id, otp)
+  await userService.updateUserOTP(user.id, otp)
   return otp
 }
 

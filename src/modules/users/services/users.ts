@@ -3,11 +3,17 @@ import { User as UserRepo } from '@/modules/users/repo/user'
 import repo from '@/modules/users/repo/repository'
 import { User } from '@/modules/users/domain/user'
 import recordService from '@/modules/records/services/records'
-import { addMinutes } from 'date-fns'
 import logger from '@/utils/logger'
 import { Result } from '@/utils/utils'
+import { addMinutes } from 'date-fns'
 
 const LOGIN_WINDOW = 2 // minutes
+export type NewUserInput = {
+  email: string
+  firstName: string
+  lastName: string
+  hasMenstruationSupport: boolean
+}
 
 const getUserById = async (userId: string, populate: boolean): Promise<Result<User>> => {
   const { data: user, error } = await repo.findUserById(userId)
@@ -27,27 +33,36 @@ const getUserById = async (userId: string, populate: boolean): Promise<Result<Us
   return { data: user, error: null }
 }
 
+const getUserByEmail = async (email: string): Promise<Result<User>> => {
+  const { data: user, error } = await repo.findUserByEmail(email)
+  if (error) {
+    return { data: null, error }
+  }
+
+  return { data: user, error: null }
+}
+
 const hashPassword = async (pass) => {
   const saltRounds = 10
   const passwordHash = await bcrypt.hash(pass, saltRounds)
   return passwordHash
 }
 
-const createNewUser = async (user) => {
-  const passwordHash = await hashPassword(user.pass)
+const createNewUser = async (input: NewUserInput, otp: string): Promise<Result<User>> => {
+  const hashedOTP = await hashPassword(otp)
+  const accessEndDate = addMinutes(new Date(), LOGIN_WINDOW)
 
-  const newUser = new UserRepo({
-    firstName: user.firstName,
-    lastName: user.lastName,
-    email: user.email,
-    hash: passwordHash,
-    hasMenstruationSupport: user.hasMenstruationSupport,
-    registeredOn: new Date(),
-    records: [],
-    accessEndDate: addMinutes(new Date(), LOGIN_WINDOW),
+  const { data, error } = await repo.createUser({
+    ...input,
+    hash: hashedOTP,
+    accessEndDate: accessEndDate,
   })
 
-  return newUser.save()
+  if (error) {
+    return { data: null, error }
+  }
+
+  return { data, error: null }
 }
 
 const addRecordIdsToUser = async (_userId, recordIds) => {
@@ -113,6 +128,7 @@ export default {
   LOGIN_WINDOW,
   createNewUser,
   getUserById,
+  getUserByEmail,
   addRecordIdsToUser,
   updateUserRecordIds,
   updateUser,

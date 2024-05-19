@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
 import { SECRET } from '@/infra/config/config'
-import User from '@/modules/users/repo/user'
+import { User as UserRepo } from '@/modules/users/repo/user'
 
 const authorize = async (req, res, next) => {
   const bearerToken = req.headers.authorization
@@ -12,7 +12,7 @@ const authorize = async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, SECRET)
 
-    const user = await User.findById(decoded['userId'])
+    const user = await UserRepo.findById(decoded['userId'])
     if (!user) {
       return res.status(404).send({ error: 'User not found.' })
     }

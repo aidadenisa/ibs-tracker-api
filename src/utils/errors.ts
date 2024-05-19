@@ -10,16 +10,11 @@ class ApiFailureError extends BaseError {
 class ValidationError extends BaseError {}
 
 class InternalError extends BaseError {}
+class NotFoundError extends BaseError {}
 
 const API_SERVER_ERROR: ApiFailureError = {
   message: 'Internal Server Error',
   statusCode: 500,
 }
 
-export {
-  BaseError,
-  ApiFailureError,
-  ValidationError,
-  InternalError,
-  API_SERVER_ERROR,
-}
+export { BaseError, ApiFailureError, ValidationError, InternalError, NotFoundError, API_SERVER_ERROR }

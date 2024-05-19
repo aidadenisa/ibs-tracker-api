@@ -1,6 +1,6 @@
 import supertest from 'supertest'
 import app from '@/app'
-import User from '@/modules/users/repo/user'
+import { User as UserRecord } from '@/modules/users/repo/user'
 import { Record as RepoRecord } from '@/modules/records/repo/record'
 import { Event } from '@/modules/events/domain/event'
 
@@ -12,6 +12,7 @@ import testApi from '@/tests_api/utils/testApi'
 import { format } from 'date-fns'
 import { closeDBConns, connectTestDB } from '@/infra/db/connection'
 import { Record } from '@/modules/records/domain/record'
+import { assert } from 'console'
 
 const api = supertest(app)
 
@@ -40,7 +41,7 @@ describe('Records API', () => {
   beforeAll(async () => {
     // make sure you delete all users and records in the test DB
     await connectTestDB()
-    await User.deleteMany({})
+    await UserRecord.deleteMany({})
     await RepoRecord.deleteMany({})
 
     const { otp, id } = await testApi.signup(testUser)
@@ -186,8 +187,10 @@ describe('Records API', () => {
       .expect(200)
       .expect(async (result) => {
         const records = result.body
-        const userInfo = await userService.getUserById(userId, false)
-        const userInfoRecordsIds = userInfo.records.map((record) => record.toString())
+        const { data: user, error } = await userService.getUserById(userId, false)
+        expect(error).toBeNull()
+
+        const userInfoRecordsIds = user.records.map((record) => record.toString())
 
         for (let i = 0; i < records.length; i++) {
           expect(userInfoRecordsIds).toContain(records[i].id)
@@ -220,15 +223,16 @@ describe('Records API', () => {
       })
       .expect(200)
 
-    const userInfo = await userService.getUserById(userId, false)
+    const { data: user, error: getUserErr } = await userService.getUserById(userId, false)
+    expect(getUserErr).toBeNull()
 
     for (let i = 0; i < recordIdsToBeRemoved.length; i++) {
-      expect(userInfo.records).not.toContain(recordIdsToBeRemoved[i])
+      expect(user.records).not.toContain(recordIdsToBeRemoved[i])
     }
   })
 
   afterAll(async () => {
-    await User.deleteMany({})
+    await UserRecord.deleteMany({})
     await RepoRecord.deleteMany({})
     await closeDBConns()
   }, 100000)

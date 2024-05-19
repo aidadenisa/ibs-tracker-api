@@ -1,6 +1,6 @@
 import supertest from 'supertest'
 import app from '@/app'
-import User from '@/modules/users/repo/user'
+import { User as UserRepo } from '@/modules/users/repo/user'
 import testApi from '@/tests_api/utils/testApi'
 import { closeDBConns, connectTestDB } from '@/infra/db/connection'
 import { Event as DomainEvent } from '@/modules/events/domain/event'
@@ -14,7 +14,7 @@ describe('GET /events', () => {
 
   beforeAll(async () => {
     await connectTestDB()
-    await User.deleteMany({})
+    await UserRepo.deleteMany({})
 
     const newTestUser = {
       firstName: 'Test First',
@@ -47,7 +47,7 @@ describe('GET /events', () => {
   }, 100000)
 
   afterAll(async () => {
-    await User.deleteMany({})
+    await UserRepo.deleteMany({})
     await closeDBConns()
   })
 })
