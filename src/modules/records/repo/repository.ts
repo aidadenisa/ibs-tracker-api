@@ -107,7 +107,7 @@ const listRecordsForDateAndUserId = async (userId: string, dayYMD: string): Prom
 }
 
 const updateRecordsForDate = async (userId: string, dayInput: DayInput, updatedEventsIds: string[]): Promise<null | InternalError> => {
-  const session = await mongoose.startSession()
+  // const session = await mongoose.startSession()
 
   // TODO: error on transactions https://stackoverflow.com/questions/51461952/mongodb-v4-0-transaction-mongoerror-transaction-numbers-are-only-allowed-on-a
   // session.startTransaction()

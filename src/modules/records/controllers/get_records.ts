@@ -16,7 +16,7 @@ const getRecordsController = async (req: Request, res: Response, next: NextFunct
   }
 
   const { data: dataList, error: errorList } = await recordsService.listRecordsByUserId(data.userId, data.populate)
-  if (error) {
+  if (errorList) {
     return res.status(API_SERVER_ERROR.statusCode).send(API_SERVER_ERROR.message)
   }
   return res.json(dataList)

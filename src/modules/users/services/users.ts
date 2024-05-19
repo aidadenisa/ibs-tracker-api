@@ -55,6 +55,7 @@ const updateUserRecordIds = async (_userId) => {
   if (error) {
     // TODO: return error
     logger.error(error.message)
+    return
   }
 
   // TODO: MAKE A DICTIONARY AND UPDATE ONLY THE SPECIFIC DATE

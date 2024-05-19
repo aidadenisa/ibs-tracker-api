@@ -164,7 +164,7 @@ const seedDB = async () => {
   try {
     for (const [c, e] of categoriesEventsMap.entries()) {
       await seedEvents(c.toUpperCase(), e)
-      seedCategory(c)
+      await seedCategory(c)
     }
   } catch (err) {
     logger.error(err)

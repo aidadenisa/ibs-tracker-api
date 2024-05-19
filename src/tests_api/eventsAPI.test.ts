@@ -36,17 +36,14 @@ describe('GET /events', () => {
 
   test('list is not empty', async () => {
     const result = await api.get('/events').set('Authorization', `Bearer ${token}`)
-
-    // we use JEST here to test the correctness https://jestjs.io/docs/using-matchers
     expect(result.body).not.toBeUndefined()
     expect(result.body.length).toBeGreaterThan(1)
   }, 100000)
 
-  //test for the structure of the event, to match the schema of mongoose
   test('respect the schema', async () => {
     const res = (await api.get('/events').set('Authorization', `Bearer ${token}`)).body
-    const events = JSON.parse(res) as DomainEvent[]
-    expect(events).toBeDefined()
+    expect(res).toBeDefined()
+    expect(Object.keys(res[0])).toEqual(['id', 'name', 'categoryCode', 'code'])
   }, 100000)
 
   afterAll(async () => {

@@ -14,11 +14,11 @@ const postRecordsMultipleController = async (req: Request, res: Response, next: 
     return res.status(API_SERVER_ERROR.statusCode).send(API_SERVER_ERROR.message)
   }
 
-  return res.status(200)
+  return res.status(200).end()
 }
 
 const isValidInput = (input: any): boolean => {
-  return !input || !input.dateInfo || !input.selectedEventsIds || !input.dateInfo?.dayYMD || !input.dateInfo?.timezone
+  return !!(input && input.dateInfo && input.selectedEventsIds && input.dateInfo?.dayYMD && input.dateInfo?.timezone)
 }
 
 export { postRecordsMultipleController }

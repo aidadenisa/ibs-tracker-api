@@ -68,12 +68,8 @@ describe('auth: user', () => {
     const updatedUsers = await User.find({})
 
     expect(initialUsers.length).toEqual(updatedUsers.length - 1)
-    expect(initialUsers.map((user) => user.id).join(' ')).not.toContain(
-      result.body.id
-    )
-    expect(updatedUsers.map((user) => user.id).join(' ')).toContain(
-      result.body.id
-    )
+    expect(initialUsers.map((user) => user.id).join(' ')).not.toContain(result.body.id)
+    expect(updatedUsers.map((user) => user.id).join(' ')).toContain(result.body.id)
 
     //Teardown
     await User.deleteOne({ email: 'new@test.com' })
