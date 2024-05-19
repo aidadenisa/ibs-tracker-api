@@ -42,9 +42,9 @@ const addRecord = async (input: RecordInput): Promise<Result<Record>> => {
   } catch (err) {
     return {
       data: null,
-      error: {
+      error: new InternalError({
         message: `error while adding the record for user id ${input.userId}: ${err.message}`,
-      } satisfies InternalError,
+      }),
     }
   }
 }
@@ -68,9 +68,9 @@ const listAllRecordsByUserID = async (userId: string): Promise<Result<Record[]>>
   } catch (err) {
     return {
       data: null,
-      error: {
+      error: new InternalError({
         message: `error while getting all records for user id ${userId}: ${err.message}`,
-      } satisfies InternalError,
+      }),
     }
   }
 }
@@ -99,9 +99,9 @@ const listRecordsForDateAndUserId = async (userId: string, dayYMD: string): Prom
   } catch (err) {
     return {
       data: null,
-      error: {
+      error: new InternalError({
         message: `error while querying records by date for user id ${userId}: ${err}`,
-      } satisfies InternalError,
+      }),
     }
   }
 }
@@ -136,9 +136,9 @@ const updateRecordsForDate = async (userId: string, dayInput: DayInput, updatedE
   } catch (err) {
     // session.abortTransaction()
     // session.endSession()
-    return {
+    return new InternalError({
       message: `error while executing update records transaction for user id ${userId}: ${err.message}`,
-    } satisfies InternalError
+    })
   }
 }
 
@@ -147,9 +147,9 @@ const deleteRecord = async (recordId: string): Promise<null | InternalError> => 
   try {
     await RepoRecord.findByIdAndDelete(recordId)
   } catch (err) {
-    return {
+    return new InternalError({
       message: `error while deleting record with id ${recordId}: ${err.message}`,
-    } satisfies InternalError
+    })
   }
   return null
 }

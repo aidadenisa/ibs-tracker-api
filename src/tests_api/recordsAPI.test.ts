@@ -45,8 +45,10 @@ describe('Records API', () => {
     await RepoRecord.deleteMany({})
 
     const { otp, id } = await testApi.signup(testUser)
-    token = (await testApi.validateOTP(testUser.email, otp)).token
+    const { data: jwt, error } = await testApi.validateOTP(testUser.email, otp)
+    expect(error).toBeNull()
 
+    token = jwt.token
     userId = id
   })
 

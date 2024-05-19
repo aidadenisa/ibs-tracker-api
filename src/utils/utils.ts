@@ -1,4 +1,4 @@
-import { InternalError } from '@/utils/errors'
+import { InternalError, NotFoundError, ValidationError } from '@/utils/errors'
 
 const parseBoolean = (value: string) => {
   switch (value) {
@@ -10,10 +10,12 @@ const parseBoolean = (value: string) => {
   }
 }
 
+type ErrorUnion = InternalError | ValidationError | NotFoundError
+
 type Result<T> = {
   data: T
-  error: InternalError
+  error: ErrorUnion
 }
 
 export { parseBoolean }
-export type { Result }
+export type { Result, ErrorUnion }

@@ -1,11 +1,10 @@
 import * as bcrypt from 'bcrypt'
-import { User as UserRepo } from '@/modules/users/repo/user'
 import repo from '@/modules/users/repo/repository'
 import { User } from '@/modules/users/domain/user'
 import recordService from '@/modules/records/services/records'
-import logger from '@/utils/logger'
-import { Result } from '@/utils/utils'
+import { ErrorUnion, Result } from '@/utils/utils'
 import { addMinutes } from 'date-fns'
+import { InternalError, NotFoundError, ValidationError } from '@/utils/errors'
 
 const LOGIN_WINDOW = 2 // minutes
 export type NewUserInput = {
@@ -13,6 +12,12 @@ export type NewUserInput = {
   firstName: string
   lastName: string
   hasMenstruationSupport: boolean
+}
+type UserAuthData = {
+  id: string
+  email: string
+  hash: string
+  accessEndDate: Date
 }
 
 const getUserById = async (userId: string, populate: boolean): Promise<Result<User>> => {
@@ -35,6 +40,15 @@ const getUserById = async (userId: string, populate: boolean): Promise<Result<Us
 
 const getUserByEmail = async (email: string): Promise<Result<User>> => {
   const { data: user, error } = await repo.findUserByEmail(email)
+  if (error) {
+    return { data: null, error }
+  }
+
+  return { data: user, error: null }
+}
+
+const getUserAuthDataByEmail = async (email: string): Promise<Result<UserAuthData>> => {
+  const { data: user, error } = await repo.findUserAuthDataByEmail(email)
   if (error) {
     return { data: null, error }
   }
@@ -65,63 +79,28 @@ const createNewUser = async (input: NewUserInput, otp: string): Promise<Result<U
   return { data, error: null }
 }
 
-const addRecordIdsToUser = async (_userId, recordIds) => {
-  const result = await UserRepo.findByIdAndUpdate(
-    _userId,
-    {
-      $push: { records: { $each: [...recordIds] } },
-    },
-    {
-      new: true,
-    }
-  )
-  return result
-}
-
-const updateUserRecordIds = async (_userId) => {
-  // const records = await Record.find({ user: _userId });
-  const { data: records, error } = await recordService.listRecordsByUserId(_userId.toString(), false)
+const updateUserRecordIds = async (userId: string): Promise<ErrorUnion> => {
+  const { data: records, error } = await recordService.listRecordsByUserId(userId, false)
   if (error) {
-    // TODO: return error
-    logger.error(error.message)
-    return
+    return error
   }
 
   // TODO: MAKE A DICTIONARY AND UPDATE ONLY THE SPECIFIC DATE
-  await UserRepo.findByIdAndUpdate(_userId, {
-    records: records.map((record) => record.id.toString()),
-  })
+  return repo.updateUserRecords(
+    userId,
+    records.map((r) => r.id)
+  )
 }
 
-const updateUser = (_userId, updatedProperties) => {
-  if (updatedProperties['hash']) {
-    delete updatedProperties['hash']
-  }
-  // properties that are not part of the schema will be ignored
-  return UserRepo.findByIdAndUpdate(_userId, updatedProperties, { new: true })
-}
-
-const updateUserOTP = async (_userId, otp) => {
+const updateUserOTP = async (userId: string, otp: string): Promise<InternalError> => {
   const hash = await hashPassword(otp)
-  return UserRepo.findByIdAndUpdate(
-    _userId,
-    {
-      hash,
-      accessEndDate: addMinutes(new Date(), LOGIN_WINDOW),
-    },
-    { new: true }
-  )
+  const accessEndDate = addMinutes(new Date(), LOGIN_WINDOW)
+
+  return repo.updateUserAuthData(userId, hash, accessEndDate)
 }
 
-const resetUserOTP = async (_userId) => {
-  return UserRepo.findByIdAndUpdate(
-    _userId,
-    {
-      hash: null,
-      accessEndDate: null,
-    },
-    { new: true }
-  )
+const resetUserOTP = async (userId: string): Promise<InternalError> => {
+  return repo.updateUserAuthData(userId, null, null)
 }
 
 export default {
@@ -129,9 +108,8 @@ export default {
   createNewUser,
   getUserById,
   getUserByEmail,
-  addRecordIdsToUser,
+  getUserAuthDataByEmail,
   updateUserRecordIds,
-  updateUser,
   updateUserOTP,
   resetUserOTP,
 }

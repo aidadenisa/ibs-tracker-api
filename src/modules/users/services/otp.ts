@@ -4,7 +4,8 @@ import { NODE_ENV } from '@/infra/config/config'
 import logger from '@/utils/logger'
 
 import emailService from '@/infra/services/email'
-import { User } from '@/modules/users/domain/user'
+import { Result } from '@/utils/utils'
+import { ValidationError } from '@/utils/errors'
 
 const numbers = '0123456789'
 const charsLower = 'abcdefghijklmnopqrstuvwxyz'
@@ -15,7 +16,10 @@ interface Recipient {
   email: string
 }
 
-const generateSecret = () => {
+export type JWT = {
+  token: string
+}
+const generateSecret = (): string => {
   const randomBytes = crypto.randomBytes(16)
 
   let randomString = ''
@@ -27,11 +31,7 @@ const generateSecret = () => {
   return randomString
 }
 
-const sendOTP = async (
-  recipient: Recipient,
-  otp: string,
-  timeToExpireMin: number
-) => {
+const sendOTP = async (recipient: Recipient, otp: string, timeToExpireMin: number) => {
   // shortcircuit the email for now, console.log OTP for local development
   if (NODE_ENV === 'dev' || NODE_ENV === 'test') {
     console.log('otp: ', otp)
@@ -72,17 +72,20 @@ const sendOTP = async (
   }
 }
 
-const verifyOTP = async (inputOTP, userOTP, expiryDate) => {
+const verifyOTP = async (inputOTP: string, userOTP: string, expiryDate: Date): Promise<Result<boolean>> => {
   if (!expiryDate || !userOTP || !inputOTP) {
-    throw new Error('Invalid OTP')
+    return { data: null, error: new ValidationError({ message: 'Invalid OTP' }) }
   }
   if (new Date().getTime() > new Date(expiryDate).getTime()) {
-    throw new Error('OTP has expired')
+    return { data: null, error: new ValidationError({ message: 'OTP has expired.' }) }
   }
 
-  const isValid = await bcrypt.compare(inputOTP, userOTP)
-
-  return isValid
+  try {
+    const isValid = await bcrypt.compare(inputOTP, userOTP)
+    return { data: isValid, error: null }
+  } catch (error) {
+    return { data: null, error: new ValidationError({ message: 'Invalid OTP' }) }
+  }
 }
 
 export default {

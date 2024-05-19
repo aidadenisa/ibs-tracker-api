@@ -36,7 +36,9 @@ describe('auth: user', () => {
       .expect(400)
       .expect('Content-Type', /application\/json/)
 
-    expect(result.body.error).toContain('The email address is already in use')
+    expect(result.body.error).toBe(
+      'Invalid signup: error while creating new user with email initial@test.com: the email address is already in use.'
+    )
 
     const usersAfterSaveAttempt = await UserRepo.find({})
     expect(usersAfterSaveAttempt).toEqual(initialUsers)

@@ -10,7 +10,7 @@ const postRecordsController = async (req: Request, res: Response, next: NextFunc
 
   const { data, error } = await recordsService.createNewRecord(body, req.user.id)
   if (error !== null) {
-    res.status(API_SERVER_ERROR.statusCode).send(API_SERVER_ERROR.message)
+    res.status(API_SERVER_ERROR.statusCode).json({ error: API_SERVER_ERROR.message })
   }
 
   res.json(data)

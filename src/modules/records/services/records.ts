@@ -1,12 +1,11 @@
 import { DayInput } from '@/modules/records/repo/repository'
 import { Record } from '@/modules/records/domain/record'
-import logger from '@/utils/logger'
 import userService from '@/modules/users/services/users'
 import eventService from '@/modules/events/services/events'
 import repo from '@/modules/records/repo/repository'
 import { InternalError } from '@/utils/errors'
 import { Event } from '@/modules/events/domain/event'
-import { Result } from '@/utils/utils'
+import { ErrorUnion, Result } from '@/utils/utils'
 
 type RecordInput = {
   eventId: string
@@ -25,7 +24,11 @@ const createNewRecord = async (record: RecordInput, userId: string): Promise<Res
     return { data: null, error }
   }
   if (data) {
-    await userService.addRecordIdsToUser(data.userId, [data.id])
+    // TODO: remove the record ids as a dependency from the User DB model
+    const error = await userService.updateUserRecordIds(data.userId)
+    if (error) {
+      return { data: null, error: error }
+    }
   }
   return { data, error: null }
 }
@@ -57,26 +60,20 @@ const listRecordsForDate = async (userId: string, dayYMD: string): Promise<Resul
   return { data, error: null }
 }
 
-const deleteRecord = async (recordId: string): Promise<null | InternalError> => {
+const deleteRecord = async (recordId: string): Promise<InternalError> => {
   return repo.deleteRecord(recordId)
 }
 
-const updateRecordsForDate = async (userId: string, dayInput: DayInput, updatedEventsIds: string[]): Promise<null | InternalError> => {
+const updateRecordsForDate = async (userId: string, dayInput: DayInput, updatedEventsIds: string[]): Promise<ErrorUnion> => {
   const err = await repo.updateRecordsForDate(userId, dayInput, updatedEventsIds)
   if (err) {
     return err
   }
 
-  // TODO: make this return error
-  try {
-    await userService.updateUserRecordIds(userId)
-  } catch (error) {
-    console.log(error)
-  }
-  return null
+  return userService.updateUserRecordIds(userId)
 }
 
-const matchEventsToRecords = (records: Record[], events: Event[]) => {
+const matchEventsToRecords = (records: Record[], events: Event[]): Record[] => {
   return records.map((record) => {
     const matchingEvent = events.find((event) => event.id === record.event.id)
     if (!matchingEvent) return

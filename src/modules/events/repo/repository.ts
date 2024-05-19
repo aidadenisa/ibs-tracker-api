@@ -22,9 +22,9 @@ const listEvents = async (): Promise<Result<Event[]>> => {
   } catch (err) {
     return {
       data: null,
-      error: {
+      error: new InternalError({
         message: `error while querying events: ${err.message}`,
-      } satisfies InternalError,
+      }),
     }
   }
 }
@@ -46,9 +46,9 @@ const findEventsByIds = async (eventIds: string[]): Promise<Result<Event[]>> => 
   } catch (err) {
     return {
       data: null,
-      error: {
+      error: new InternalError({
         message: `error while querying events by ids: ${err.message}`,
-      } satisfies InternalError,
+      }),
     }
   }
 }
@@ -76,9 +76,9 @@ const listCategories = async (): Promise<Result<Category[]>> => {
   } catch (err) {
     return {
       data: null,
-      error: {
+      error: new InternalError({
         message: `error while querying categories: ${err.message}`,
-      } satisfies InternalError,
+      }),
     }
   }
 }

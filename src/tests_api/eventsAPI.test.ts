@@ -23,7 +23,10 @@ describe('GET /events', () => {
       hasMenstruationSupport: true,
     }
     const { otp } = await testApi.signup(newTestUser)
-    token = (await testApi.validateOTP(newTestUser.email, otp)).token
+    const { data: jwt, error } = await testApi.validateOTP(newTestUser.email, otp)
+    expect(error).toBeNull()
+
+    token = jwt.token
   }, 100000)
 
   test('are returned as JSON with status 200', async () => {

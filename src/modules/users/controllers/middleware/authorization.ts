@@ -12,9 +12,10 @@ const authorize = async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, SECRET)
 
+    // TODO: replace this with service call
     const user = await UserRepo.findById(decoded['userId'])
     if (!user) {
-      return res.status(404).send({ error: 'User not found.' })
+      return res.status(404).json({ error: 'User not found.' })
     }
     req.user = user
     next()

@@ -6,7 +6,7 @@ const getCategoriesController = async (req: Request, res: Response, next: NextFu
   const populate = req.query.populate === 'true'
   const { data, error } = await categoriesService.getCategories(populate)
   if (error) {
-    return res.status(API_SERVER_ERROR.statusCode).send(API_SERVER_ERROR.message)
+    return res.status(API_SERVER_ERROR.statusCode).json({ error: API_SERVER_ERROR.message })
   }
   return res.status(200).json(data)
 }

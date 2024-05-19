@@ -1,11 +1,10 @@
-import { User as UserRecord } from '@/modules/users/repo/user'
 import jwt from 'jsonwebtoken'
 import { SECRET } from '@/infra/config/config'
 import userService, { NewUserInput } from '@/modules/users/services/users'
-import otpService from '@/modules/users/services/otp'
+import otpService, { JWT } from '@/modules/users/services/otp'
 import { Result } from '@/utils/utils'
 import { User } from '@/modules/users/domain/user'
-import { InternalError, NotFoundError } from '@/utils/errors'
+import { ErrorType, InternalError, NotFoundError, ValidationError } from '@/utils/errors'
 
 const login = async (email: string): Promise<NotFoundError | InternalError> => {
   const { data: user, error } = await userService.getUserByEmail(email)
@@ -13,14 +12,17 @@ const login = async (email: string): Promise<NotFoundError | InternalError> => {
     return error
   }
   if (!user) {
-    return { message: `User not found.` } satisfies NotFoundError
+    return { message: `User not found.` } as NotFoundError
   }
 
-  const otp = await refreshUserOTP(user)
+  const { data: otp, error: err } = await refreshUserOTP(user)
+  if (err) {
+    return new InternalError({ message: `error while refreshing the OTP: ${err.message}` })
+  }
 
   otpService.sendOTP({ firstName: user.firstName, email: user.email }, otp, userService.LOGIN_WINDOW)
 
-  return
+  return null
 }
 
 const signup = async (input: NewUserInput): Promise<Result<User>> => {
@@ -35,17 +37,27 @@ const signup = async (input: NewUserInput): Promise<Result<User>> => {
   return { data: user, error: null }
 }
 
-const validateOTP = async (email, inputOTP) => {
-  const user = await UserRecord.findOne({ email })
-  if (!user) throw new Error('User not found.')
-
-  const isValid = await otpService.verifyOTP(inputOTP, user.hash, user.accessEndDate)
-
-  if (!isValid) {
-    throw new Error('Invalid OTP.')
+const validateOTP = async (email: string, otp: string): Promise<Result<JWT>> => {
+  const { data: user, error: err } = await userService.getUserAuthDataByEmail(email)
+  if (err) {
+    return { data: null, error: err }
+  }
+  if (!user) {
+    return { data: null, error: new NotFoundError({ message: 'User not found.' }) }
   }
 
-  userService.resetUserOTP(user._id)
+  const { data: isValid, error: er } = await otpService.verifyOTP(otp, user.hash, user.accessEndDate)
+  if (!isValid || (er && er.type === ErrorType.ErrValidation)) {
+    return { data: null, error: new ValidationError({ message: `Invalid OTP: ${er.message}` }) }
+  }
+  if (er) {
+    return { data: null, error: err }
+  }
+
+  const error = await userService.resetUserOTP(user.id)
+  if (error) {
+    return { data: null, error }
+  }
 
   const tokenData = {
     email: user.email,
@@ -53,13 +65,18 @@ const validateOTP = async (email, inputOTP) => {
   }
   const token = jwt.sign(tokenData, SECRET)
 
-  return { token }
+  return { data: { token }, error: null }
 }
 
-const refreshUserOTP = async (user: User) => {
+const refreshUserOTP = async (user: User): Promise<Result<string>> => {
   const otp = otpService.generateSecret()
-  await userService.updateUserOTP(user.id, otp)
-  return otp
+
+  const error = await userService.updateUserOTP(user.id, otp)
+  if (error) {
+    return { data: null, error: error }
+  }
+
+  return { data: otp, error: null }
 }
 
 export default {
