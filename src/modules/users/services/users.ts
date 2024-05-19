@@ -1,16 +1,30 @@
 import * as bcrypt from 'bcrypt'
-import User from '@/modules/users/repo/user'
+import { User as UserRepo } from '@/modules/users/repo/user'
+import repo from '@/modules/users/repo/repository'
+import { User } from '@/modules/users/domain/user'
 import recordService from '@/modules/records/services/records'
 import { addMinutes } from 'date-fns'
 import logger from '@/utils/logger'
+import { Result } from '@/utils/utils'
 
 const LOGIN_WINDOW = 2 // minutes
 
-const getUserById = (userId, populate) => {
-  if (populate && populate.toLowerCase() === 'true') {
-    return User.findById(userId).populate('records')
+const getUserById = async (userId: string, populate: boolean): Promise<Result<User>> => {
+  const { data: user, error } = await repo.findUserById(userId)
+  if (error) {
+    return { data: null, error }
   }
-  return User.findById(userId)
+
+  if (user && populate) {
+    const { data: records, error: err } = await recordService.listRecordsByUserId(userId)
+    if (err) {
+      return { data: null, error: err }
+    }
+    if (records && records.length) {
+      user.records = records
+    }
+  }
+  return { data: user, error: null }
 }
 
 const hashPassword = async (pass) => {
@@ -22,7 +36,7 @@ const hashPassword = async (pass) => {
 const createNewUser = async (user) => {
   const passwordHash = await hashPassword(user.pass)
 
-  const newUser = new User({
+  const newUser = new UserRepo({
     firstName: user.firstName,
     lastName: user.lastName,
     email: user.email,
@@ -37,7 +51,7 @@ const createNewUser = async (user) => {
 }
 
 const addRecordIdsToUser = async (_userId, recordIds) => {
-  const result = await User.findByIdAndUpdate(
+  const result = await UserRepo.findByIdAndUpdate(
     _userId,
     {
       $push: { records: { $each: [...recordIds] } },
@@ -59,7 +73,7 @@ const updateUserRecordIds = async (_userId) => {
   }
 
   // TODO: MAKE A DICTIONARY AND UPDATE ONLY THE SPECIFIC DATE
-  await User.findByIdAndUpdate(_userId, {
+  await UserRepo.findByIdAndUpdate(_userId, {
     records: records.map((record) => record.id.toString()),
   })
 }
@@ -69,12 +83,12 @@ const updateUser = (_userId, updatedProperties) => {
     delete updatedProperties['hash']
   }
   // properties that are not part of the schema will be ignored
-  return User.findByIdAndUpdate(_userId, updatedProperties, { new: true })
+  return UserRepo.findByIdAndUpdate(_userId, updatedProperties, { new: true })
 }
 
 const updateUserOTP = async (_userId, otp) => {
   const hash = await hashPassword(otp)
-  return User.findByIdAndUpdate(
+  return UserRepo.findByIdAndUpdate(
     _userId,
     {
       hash,
@@ -85,7 +99,7 @@ const updateUserOTP = async (_userId, otp) => {
 }
 
 const resetUserOTP = async (_userId) => {
-  return User.findByIdAndUpdate(
+  return UserRepo.findByIdAndUpdate(
     _userId,
     {
       hash: null,

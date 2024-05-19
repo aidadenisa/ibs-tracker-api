@@ -26,4 +26,4 @@ prettifyId(UserSchema)
 UserSchema.plugin(uniqueValidator)
 const User = mongoose.model('User', UserSchema)
 
-export default User
+export { User }

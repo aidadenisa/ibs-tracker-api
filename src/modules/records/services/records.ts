@@ -68,7 +68,12 @@ const updateRecordsForDate = async (userId: string, dayInput: DayInput, updatedE
   }
 
   // TODO: make this return error
-  await userService.updateUserRecordIds(userId)
+  try {
+    await userService.updateUserRecordIds(userId)
+  } catch (error) {
+    console.log(error)
+  }
+  return null
 }
 
 const matchEventsToRecords = (records: Record[], events: Event[]) => {
