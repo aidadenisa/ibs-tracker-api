@@ -1,13 +1,10 @@
 import cors from 'cors'
 import express from 'express'
-import { errorHandler } from '@/middleware/middleware'
-import { authorize } from '@/middleware/authorization'
+import { authorize } from '@/modules/users/controllers/middleware/authorization'
 
-import eventRouter from '@/controllers/events'
-import recordRouter from '@/controllers/records'
-import userRouter from '@/controllers/users'
-import authRouter from '@/controllers/auth'
-import categoriesRouter from '@/controllers/categories'
+import eventRouter from '@/modules/events/controllers/handler'
+import recordRouter from '@/modules/records/controllers/handler'
+import { userRouter, authRouter } from '@/modules/users/controllers/handler'
 
 const app = express()
 
@@ -22,13 +19,12 @@ app.get('/', async (request, response) => {
 })
 
 app.use('/auth', authRouter)
-app.use('/events', authorize, eventRouter)
-app.use('/records', authorize, recordRouter)
 app.use('/users', authorize, userRouter)
-app.use('/categories', authorize, categoriesRouter)
+app.use('/records', authorize, recordRouter)
+app.use('/events', authorize, eventRouter)
 // Handler for requests with unknown endpoint
 // app.use(unknownEndpoint)
 // Handler of requests that have errors
-app.use(errorHandler)
+// app.use(errorHandler)
 
 export default app
